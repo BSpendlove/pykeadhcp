@@ -33,4 +33,4 @@ All supported commands by the daemons are in the format of the API referenced co
 
 ## Development / Contribution
 
-See [this document which explains the development/setup to contribute to this project](https://github.com/BSpendlove/pykeadhcp/CONTRIBUTING.md)
+See [this document which explains the development/setup to contribute to this project](https://github.com/BSpendlove/pykeadhcp/blob/main/CONTRIBUTING.md)
