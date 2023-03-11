@@ -7,7 +7,7 @@ setup(
     long_description=open("README.md").read(),
     url="https://github.com/BSpendlove/pykeadhcp",
     author="Brandon Spendlove",
-    author_email="brandon@youfibre.com",
+    author_email="brandonspendlove@gmail.com",
     install_requires=["requests>=2.28.2"],
     packages=find_packages(),
     extras_require={"dev": ["black", "build", "twine"]},
