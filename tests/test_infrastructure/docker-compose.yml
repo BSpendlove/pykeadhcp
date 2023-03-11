@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  kea:
+    build: .
+    ports:
+      - "8000:8080" # API Access
+      - "67:67/udp" # DHCP v4 Daemon
+      - "547:547/udp" # DHCP v6 Daemon
+    volumes:
+      - ./configs/kea-ctrl-agent.conf:/usr/local/etc/kea/kea-ctrl-agent.conf:Z
+      - ./configs/kea-dhcp4.conf:/usr/local/etc/kea/kea-dhcp4.conf:Z
+      - ./configs/kea-dhcp6.conf:/usr/local/etc/kea/kea-dhcp6.conf:Z
+    tty: true

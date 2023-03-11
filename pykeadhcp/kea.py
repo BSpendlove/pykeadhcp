@@ -1,7 +1,7 @@
 from requests.models import Response
 import requests
 
-from pykeadhcp.daemons import Dhcp4, CtrlAgent
+from pykeadhcp.daemons import CtrlAgent, Ddns, Dhcp4, Dhcp6
 
 
 class Kea:
@@ -20,10 +20,10 @@ class Kea:
         self.host = host
         self.port = port
         self.headers = headers
-        self.dhcp4 = Dhcp4(self)
-        self.dhcp6 = None
         self.ctrlagent = CtrlAgent(self)
-        self.ddns = None
+        self.ddns = Ddns(self)
+        self.dhcp4 = Dhcp4(self)
+        self.dhcp6 = Dhcp6(self)
         self.services = ["dhcp4", "dhcp6", "ctrlagent", "ddns"]
 
         self.url = f"{self.host}:{self.port}"
