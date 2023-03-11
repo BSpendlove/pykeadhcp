@@ -56,7 +56,7 @@ class Dhcp6:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#config-test
         """
         return self.api.send_command_with_arguments(
-            command="config-test", service=self.service
+            command="config-test", service=self.service, arguments=config
         )
 
     def config_write(self, filename: str) -> dict:
@@ -72,4 +72,37 @@ class Dhcp6:
             command="config-write",
             service=self.service,
             arguments={"filename": filename},
+        )
+
+    def list_commands(self) -> dict:
+        """List all commands supported by the server/service
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-list-commands
+        """
+        return self.api.send_command_with_arguments(
+            command="list-commands", service=self.service, arguments={}
+        )
+
+    def statistic_get(self, name: str) -> dict:
+        """Returns single statistic
+
+        Args:
+            name:       Name of the statistic to get
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-statistic-get
+        """
+        return self.api.send_command_with_arguments(
+            command="statistic-get", service=self.service, arguments={"name": name}
+        )
+
+    def statistic_get_all(self) -> dict:
+        """Returns all recorded statistics
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-statistic-get-all
+        """
+        return self.api.send_command_with_arguments(
+            command="statistic-get-all", service=self.service, arguments={}
         )

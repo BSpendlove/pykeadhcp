@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pykeadhcp",
-    version="0.0.2",
+    version="0.0.3",
     description="Wrapper around requests module to query ISC Kea DHCP API Daemons (ctrlagent, dhcp4, dhcp6, ddns)",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
