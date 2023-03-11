@@ -24,7 +24,7 @@ class Kea:
         self.ddns = Ddns(self)
         self.dhcp4 = Dhcp4(self)
         self.dhcp6 = Dhcp6(self)
-        self.services = ["dhcp4", "dhcp6", "ctrlagent", "ddns"]
+        self.services = ["dhcp4", "dhcp6", "ddns", None]  # None = Control-Agent Daemon
 
         self.url = f"{self.host}:{self.port}"
 
@@ -51,12 +51,15 @@ class Kea:
             command:        Supported command by the daemons API
             service:        Service to send request to
         """
-        if service.lower() not in self.services:
+        if service and service.lower() not in self.services:
             raise TypeError(
                 f"Service {service} is not a supported service. The supported services are {self.services}"
             )
 
-        return self.post(endpoint="/", body={"command": command, "service": [service]})
+        return self.post(
+            endpoint="/",
+            body={"command": command, "service": [service] if service else []},
+        )
 
     def send_command_with_arguments(
         self, command: str, service: str, arguments: dict
@@ -68,12 +71,16 @@ class Kea:
             service:        Service to send request to
             arguments:      Argument parameters to pass to the command/service
         """
-        if service.lower() not in self.services:
+        if service and service.lower() not in self.services:
             raise TypeError(
                 f"Service {service} is not a supported service. The supported services are {self.services}"
             )
 
         return self.post(
             endpoint="/",
-            body={"command": command, "service": [service], "arguments": arguments},
+            body={
+                "command": command,
+                "service": [service] if service else [],
+                "arguments": arguments,
+            },
         )

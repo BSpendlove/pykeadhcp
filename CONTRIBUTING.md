@@ -5,16 +5,25 @@ email, or any other method with the owners of this repository before making a ch
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
+## Tests
+
+A basic infrastructure is provided in this project under the `tests/test_infrastructure` folder which creates a basic ISC Kea DHCP server running the 4 main daemons (control-agent, ddns, dhcp4 and dhcp6). Before code is merged into main, you must ensure that you implement the relevant pytest functions in the appropriate test file (eg. `test_kea_dhcp4.py` contains all the relevant tests against the dhcp4 API command).
+
+You must adhere to the following formats for tests:
+1. All relevant tests must be placed in their respective file for that daemon (eg. dhcp4 tests must be placed inside `test_kea_dhcp4.py` test file)
+2. All functions must following the format of `test_kea_<daemon_name>_<API reference command>` where the `API reference command` follows the same name as the Kea API documentation, replacing special charaters (hypthens) and spaces with an underscore. For example if you are implementing the dhcp4 config-get API command, the function name must be `test_kea_dhcp4_config_get`.
+
 ## Pull Request Process
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
    build.
 2. Update the README.md with details of changes to the interface, this includes new environment 
    variables, exposed ports, useful file locations and container parameters.
-3. Increase the version numbers in any examples files and the README.md to the new version that this
+3. Perform tests as required using pytest `pytest -s tests`. If you are only implementing API changes for dhcp4 and the control agent but not dhcp6, you can skip these tests using `pytest -s tests -k "not dhcp6"`. Ensure that you provide the output of the tests in the pull request as this will be compared when another developer runs the test to validate the new test work along with the old tests.
+4. Increase the version numbers in any examples files and the README.md to the new version that this
    Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/). Ideally
    you can use `bump` module to do this.
-4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
+5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
 ## Code of Conduct
