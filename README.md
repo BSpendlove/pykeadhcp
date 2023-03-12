@@ -35,7 +35,7 @@ All supported commands by the daemons are in the format of the API referenced co
 
 ### control-agent (ca)
 
-| Command | Implemented | Tested |
+| Command | Implemented | Test Implemented |
 | --- | --- | --- |
 | build-report | :white_check_mark: | - |
 | config-get | :white_check_mark: | - |
@@ -50,7 +50,7 @@ All supported commands by the daemons are in the format of the API referenced co
 
 ### ddns
 
-| Command | Implemented | Tested |
+| Command | Implemented | Test Implemented |
 | --- | --- | --- |
 | build-report | - | - |
 | config-get | - | - |
@@ -79,9 +79,9 @@ All supported commands by the daemons are in the format of the API referenced co
 
 ### dhcp4
 
-| Command | Implemented | Tested |
+| Command | Implemented | Test Implemented |
 | --- | --- | --- |
-| build-report | - | - |
+| build-report | :white_check_mark: | :white_check_mark: |
 | cache-clear | - | - |
 | cache-flush | - | - |
 | cache-get | - | - |
@@ -97,13 +97,13 @@ All supported commands by the daemons are in the format of the API referenced co
 | class-list | - | - |
 | class-update | - | - |
 | config-backend-pull | - | - |
-| config-get | - | - |
-| config-reload | - | - |
-| config-set | - | - |
-| config-test | - | - |
-| config-write | - | - |
-| dhcp-disable | - | - |
-| dhcp-enable | - | - |
+| config-get | :white_check_mark: | :white_check_mark: |
+| config-reload | :white_check_mark: | :white_check_mark: |
+| config-set | :white_check_mark: | - |
+| config-test | :white_check_mark: | - |
+| config-write | :white_check_mark: | - |
+| dhcp-disable | :white_check_mark: | :white_check_mark: |
+| dhcp-enable | :white_check_mark: | :white_check_mark: |
 | ha-continue | - | - |
 | ha-heartbeat | - | - |
 | ha-maintenance-cancel | - | - |
@@ -113,26 +113,26 @@ All supported commands by the daemons are in the format of the API referenced co
 | ha-scopes | - | - |
 | ha-sync | - | - |
 | ha-sync-complete-notify | - | - |
-| lease4-add | - | - |
-| lease4-del | - | - |
-| lease4-get | - | - |
-| lease4-get-all | - | - |
-| lease4-get-by-client-id | - | - |
-| lease4-get-by-hostname | - | - |
-| lease4-get-by-hw-address | - | - |
-| lease4-get-page | - | - |
-| lease4-resend-ddns | - | - |
-| lease4-update | - | - |
-| lease4-wipe | - | - |
-| leases-reclaim | - | - |
-| libreload | - | - |
-| list-commands | - | - |
-| network4-add | - | - |
-| network4-del | - | - |
-| network4-get | - | - |
-| network4-list | - | - |
-| network4-subnet-add | - | - |
-| network4-subnet-del | - | - |
+| lease4-add | :white_check_mark: | - |
+| lease4-del | :white_check_mark: | - |
+| lease4-get | :white_check_mark: | - |
+| lease4-get-all | :white_check_mark: | - |
+| lease4-get-by-client-id | :white_check_mark: | - |
+| lease4-get-by-hostname | :white_check_mark: | - |
+| lease4-get-by-hw-address | :white_check_mark: | - |
+| lease4-get-page | :white_check_mark: | - |
+| lease4-resend-ddns | :white_check_mark: | - |
+| lease4-update | :white_check_mark: | - |
+| lease4-wipe | :white_check_mark: | - |
+| leases-reclaim | :white_check_mark: | - |
+| libreload | :white_check_mark: | - |
+| list-commands | :white_check_mark: | :white_check_mark: |
+| network4-add | :white_check_mark: | :white_check_mark: |
+| network4-del | :white_check_mark: | :white_check_mark: |
+| network4-get | :white_check_mark: | :white_check_mark: |
+| network4-list | :white_check_mark: | :white_check_mark: |
+| network4-subnet-add | :white_check_mark: | :white_check_mark: |
+| network4-subnet-del | :white_check_mark: | :white_check_mark: |
 | remote-class4-del | - | - |
 | remote-class4-get | - | - |
 | remote-class4-get-all | - | - |
@@ -177,10 +177,10 @@ All supported commands by the daemons are in the format of the API referenced co
 | reservation-get-by-id | - | - |
 | reservation-get-page | - | - |
 | server-tag-get | - | - |
-| shutdown | - | - |
+| shutdown | :white_check_mark: | :white_check_mark: |
 | stat-lease4-get | - | - |
-| statistic-get | - | - |
-| statistic-get-all | - | - |
+| statistic-get | :white_check_mark: | :white_check_mark: |
+| statistic-get-all | :white_check_mark: | :white_check_mark: |
 | statistic-remove | - | - |
 | statistic-remove-all | - | - |
 | statistic-reset | - | - |
@@ -189,19 +189,19 @@ All supported commands by the daemons are in the format of the API referenced co
 | statistic-sample-age-set-all | - | - |
 | statistic-sample-count-set | - | - |
 | statistic-sample-count-set-all | - | - |
-| status-get | - | - |
-| subnet4-add | - | - |
-| subnet4-del | - | - |
-| subnet4-delta-add | - | - |
-| subnet4-delta-del | - | - |
-| subnet4-get | - | - |
-| subnet4-list | - | - |
-| subnet4-update | - | - |
-| version-get | - | - |
+| status-get | :white_check_mark: | :white_check_mark: |
+| subnet4-add | :white_check_mark: | :white_check_mark: |
+| subnet4-del | :white_check_mark: | :white_check_mark: |
+| subnet4-delta-add | :white_check_mark: | :white_check_mark: |
+| subnet4-delta-del | :white_check_mark: | :white_check_mark: |
+| subnet4-get | :white_check_mark: | :white_check_mark: |
+| subnet4-list | :white_check_mark: | :white_check_mark: |
+| subnet4-update | :white_check_mark: | :white_check_mark: |
+| version-get | :white_check_mark: | :white_check_mark: |
 
 ### dhcp6
 
-| Command | Implemented | Tested |
+| Command | Implemented | Test Implemented |
 | --- | --- | --- |
 | build-report | - | - |
 | cache-clear | - | - |
