@@ -80,3 +80,17 @@ class ParserInvalidHostReservationIdentifierError(GenericParserError):
     def __init__(self, identifier_type: str):
         self.message = f"Identifier Typer {identifier_type} is not a valid type"
         super().__init__(self.message)
+
+
+class ParserPDPoolAlreadyExistError(GenericParserError):
+    def __init__(self, prefix: str, prefix_len: int, id: int):
+        self.message = (
+            f"PD Prefix {prefix}/{prefix_len} already exist in a subnet ({id})"
+        )
+        super().__init__(self.message)
+
+
+class ParserPDPoolNotFoundError(GenericParserError):
+    def __init__(self, id: int, prefix: str, prefix_len: int):
+        self.message = f"Unable to find PD Prefix {prefix}/{prefix_len} in subnet {id}"
+        super().__init__(self.message)
