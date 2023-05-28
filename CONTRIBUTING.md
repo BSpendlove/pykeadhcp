@@ -12,7 +12,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 - Currently `black` is used with the default configuration, please ensure you use `black` to format your python code. If you are running VSCode then you can set to format on save with the black formatter to save time, however you must provide output of running `black` before your pull request is considered
 - Always write tests for new command features that interact with the Kea API or the local cached configuration
 - Any functions should follow the Kea API documentation (with the exception of reserved variable names) as closely as possible
-- List comprehensions should always be used where possible unless the code is too ugly and unreadable, that is up for you and the review to agree with :-)
+- List comprehensions should always be used where possible unless the code is too ugly and unreadable, that is up for you and the reviewer to agree with :-)
 
 ## Tests
 

@@ -70,21 +70,14 @@ class Kea:
         Args:
             hooks:      List of hook libraries
         """
-        hook_libraries = []
-        # hook_libraries = [
-        #    Hook(
-        #        library=hook["library"],
-        #        parameters=hook.get("parameters", {}),
-        #        name=self.get_hook_name(hook["library"]),
-        #    )
-        #    for hook in hooks
-        # ]
-        for hook in hooks:
-            library = hook["library"]
-            hook = Hook.parse_obj(hook)
-            hook.name = self.get_hook_name(hook_path=library)
-            hook_libraries.append(hook)
-
+        hook_libraries = [
+            Hook(
+                library=hook["library"],
+                parameters=hook.get("parameters", {}),
+                name=self.get_hook_name(hook["library"]),
+            )
+            for hook in hooks
+        ]
         return hook_libraries
 
     def get_hook_name(self, hook_path: str) -> str:
