@@ -3,13 +3,25 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pykeadhcp import Kea
 
+from pykeadhcp.models.generic import KeaResponse
+
 
 class Ddns:
     def __init__(self, api: "Kea"):
         self.service = "Ddns"
         self.api = api
 
-    def build_report(self) -> dict:
+        # Cache config and hooks
+        try:
+            self.cached_config = self.config_get().arguments[self.service.capitalize()]
+            self.hook_libraries = self.api.get_active_hooks(
+                hooks=self.cached_config["hooks-libraries"]
+            )
+            self.api.hook_library[self.service] = self.hook_libraries
+        except:
+            pass
+
+    def build_report(self) -> KeaResponse:
         """Returns list of compilation options that this particular binary was built with
 
         Kea API Reference:
@@ -17,7 +29,7 @@ class Ddns:
         """
         return self.api.send_command(command="build-report", service=self.service)
 
-    def config_get(self) -> dict:
+    def config_get(self) -> KeaResponse:
         """Retrieves the current configuration used by the server
 
         Kea API Reference:
@@ -25,7 +37,7 @@ class Ddns:
         """
         return self.api.send_command(command="config-get", service=self.service)
 
-    def config_reload(self) -> dict:
+    def config_reload(self) -> KeaResponse:
         """Reloads the last good configuration (configuration file on disk)
 
         Kea API Reference:
@@ -33,7 +45,7 @@ class Ddns:
         """
         return self.api.send_command(command="config-reload", service=self.service)
 
-    def config_set(self, config: dict) -> dict:
+    def config_set(self, config: dict) -> KeaResponse:
         """Replace the current server configuration with the provided configuration
 
         Args:
@@ -46,7 +58,7 @@ class Ddns:
             command="config-set", service=self.service, arguments=config
         )
 
-    def config_test(self, config: dict) -> dict:
+    def config_test(self, config: dict) -> KeaResponse:
         """Check whether the configuration supplied can be loaded by the dhcp4 daemon
 
         Args:
@@ -59,7 +71,7 @@ class Ddns:
             command="config-test", service=self.service, arguments=config
         )
 
-    def config_write(self, filename: str) -> dict:
+    def config_write(self, filename: str) -> KeaResponse:
         """Write the current configuration to a file on disk
 
         Args:
@@ -74,7 +86,7 @@ class Ddns:
             arguments={"filename": filename},
         )
 
-    def list_commands(self) -> dict:
+    def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
 
         Kea API Reference:
@@ -84,7 +96,7 @@ class Ddns:
             command="list-commands", service=self.service, arguments={}
         )
 
-    def statistic_get(self, name: str) -> dict:
+    def statistic_get(self, name: str) -> KeaResponse:
         """Returns single statistic
 
         Args:
@@ -97,7 +109,7 @@ class Ddns:
             command="statistic-get", service=self.service, arguments={"name": name}
         )
 
-    def statistic_get_all(self) -> dict:
+    def statistic_get_all(self) -> KeaResponse:
         """Returns all recorded statistics
 
         Kea API Reference:

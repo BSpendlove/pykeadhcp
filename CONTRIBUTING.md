@@ -5,6 +5,15 @@ email, or any other method with the owners of this repository before making a ch
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
+## Coding Style
+
+- Minimum version of Python to use during development and production releases is 3.10.6
+- Always use f-strings as they are far more superior than `%` and `.format()`
+- Currently `black` is used with the default configuration, please ensure you use `black` to format your python code. If you are running VSCode then you can set to format on save with the black formatter to save time, however you must provide output of running `black` before your pull request is considered
+- Always write tests for new command features that interact with the Kea API or the local cached configuration
+- Any functions should follow the Kea API documentation (with the exception of reserved variable names) as closely as possible
+- List comprehensions should always be used where possible unless the code is too ugly and unreadable, that is up for you and the review to agree with :-)
+
 ## Tests
 
 A basic infrastructure is provided in this project under the `tests/test_infrastructure` folder which creates a basic ISC Kea DHCP server running the 4 main daemons (control-agent, ddns, dhcp4 and dhcp6). Before code is merged into main, you must ensure that you implement the relevant pytest functions in the appropriate test file (eg. `test_kea_dhcp4.py` contains all the relevant tests against the dhcp4 API command).
@@ -17,9 +26,9 @@ You must adhere to the following formats for tests:
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
    build.
-2. Update the README.md with details of changes to the interface, this includes new environment 
+2. Update any documentation with details of changes (readme, commands, etc...), this includes new environment 
    variables, exposed ports, useful file locations and container parameters.
-3. Perform tests as required using pytest `pytest -s tests`. If you are only implementing API changes for dhcp4 and the control agent but not dhcp6, you can skip these tests using `pytest -s tests -k "not dhcp6"`. Ensure that you provide the output of the tests in the pull request as this will be compared when another developer runs the test to validate the new test work along with the old tests.
+3. Perform tests as required using pytest `pytest -s tests`. If you are only implementing API changes for dhcp4 and the control agent but not dhcp6, you can skip these tests using `pytest -s tests -k "dhcp4"`. Ensure that you provide the output of the tests in the pull request as this will be compared when another developer runs the test to validate the new test work along with the old tests.
 4. Increase the version numbers in any examples files and the README.md to the new version that this
    Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/). Ideally
    you can use `bump` module to do this.

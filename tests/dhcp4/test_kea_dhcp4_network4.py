@@ -1,4 +1,7 @@
 from pykeadhcp import Kea
+from pykeadhcp.models.dhcp4.shared_network import SharedNetwork4
+from pykeadhcp.models.dhcp4.subnet import Subnet4
+from pykeadhcp.exceptions import KeaSharedNetworkNotFoundException
 import pytest
 
 """network4 process:
@@ -15,70 +18,71 @@ list
 
 
 def test_kea_dhcp4_network4_get_non_existent(kea_server: Kea):
-    response = kea_server.dhcp4.network4_get(name="pykeadhcp-pytest")
-    assert response["result"] == 3
+    name = "pykeadhcp-pytest"
+    with pytest.raises(KeaSharedNetworkNotFoundException):
+        response = kea_server.dhcp4.network4_get(name=name)
 
 
 def test_kea_dhcp4_network4_add(kea_server: Kea):
-    response = kea_server.dhcp4.network4_add(
-        shared_networks=[
-            {"name": "pykeadhcp-pytest", "user-context": {"comment": "pytest"}}
-        ]
-    )
-    assert response["result"] == 0
+    name = "pykeadhcp-pytest"
+    data = SharedNetwork4(name=name)
+    shared_networks = [data]
+    response = kea_server.dhcp4.network4_add(shared_networks)
+    assert response.result == 0
 
 
 def test_kea_dhcp4_network4_add_duplicate(kea_server: Kea):
-    response = kea_server.dhcp4.network4_add(
-        shared_networks=[
-            {"name": "pykeadhcp-pytest", "user-context": {"comment": "pytest"}}
-        ]
-    )
-    assert response["result"] == 1
+    name = "pykeadhcp-pytest"
+    data = SharedNetwork4(name=name)
+    shared_networks = [data]
+    response = kea_server.dhcp4.network4_add(shared_networks)
+    assert response.result == 1
 
 
 def test_kea_dhcp4_network4_get(kea_server: Kea):
-    response = kea_server.dhcp4.network4_get(name="pykeadhcp-pytest")
-    assert response["result"] == 0
+    name = "pykeadhcp-pytest"
+    response = kea_server.dhcp4.network4_get(name=name)
+    assert response
+    assert response.name == name
 
 
 def test_kea_dhcp4_network4_subnet_add(kea_server: Kea):
-    # Create temporary subnet
-    subnet = kea_server.dhcp4.subnet4_add(
-        subnets=[{"id": 40123, "subnet": "192.0.2.32/31"}]
-    )
-    assert subnet["result"] == 0
+    name = "pykeadhcp-pytest"
 
-    # assign subnet to our existing shared-network
-    response = kea_server.dhcp4.network4_subnet_add(
-        name="pykeadhcp-pytest", subnet_id=40123
-    )
-    assert response["result"] == 0
+    # Create Temporary Subnet
+    data = Subnet4(subnet="192.0.2.32/31", id=40123)
+    subnets = [data]
+    subnet = kea_server.dhcp4.subnet4_add(subnets=subnets)
+    assert subnet.result == 0
 
-    # Confirm shared-network has 1 subnet
-    shared_network = kea_server.dhcp4.network4_get(name="pykeadhcp-pytest")
-    assert shared_network["result"] == 0
-    assert len(shared_network["arguments"]["shared-networks"][0]["subnet4"]) == 1
+    # Assign Subnet to existing shared network
+    response = kea_server.dhcp4.network4_subnet_add(name=name, subnet_id=data.id)
+    assert response.result == 0
+
+    # Confirm shared-network has at least 1 subnet
+    shared_network = kea_server.dhcp4.network4_get(name=name)
+    assert shared_network
+    assert len(shared_network.subnet4) == 1
 
 
 def test_kea_dhcp4_network4_subnet_del(kea_server: Kea):
+    name = "pykeadhcp-pytest"
+
     # Delete temporary subnet assosication
-    subnet = kea_server.dhcp4.network4_subnet_del(
-        name="pykeadhcp-pytest", subnet_id=40123
-    )
-    assert subnet["result"] == 0
+    response = kea_server.dhcp4.network4_subnet_del(name=name, subnet_id=40123)
+    assert response.result == 0
 
-    # Delete temporary subnet
+    # Delete Temporary Subnet
     deleted_subnet = kea_server.dhcp4.subnet4_del(subnet_id=40123)
-    assert deleted_subnet["result"] == 0
+    assert deleted_subnet.result == 0
 
-    # Confirm shared-network has no subnets
-    shared_network = kea_server.dhcp4.network4_get(name="pykeadhcp-pytest")
-    assert shared_network["result"] == 0
-
-    assert len(shared_network["arguments"]["shared-networks"][0]["subnet4"]) == 0
+    # Confirm Shared Network now has 0 subnets
+    shared_network = kea_server.dhcp4.network4_get(name=name)
+    assert shared_network
+    assert len(shared_network.subnet4) == 0
 
 
 def test_kea_dhcp4_network4_del(kea_server: Kea):
-    response = kea_server.dhcp4.network4_del(name="pykeadhcp-pytest")
-    assert response["result"] == 0
+    name = "pykeadhcp-pytest"
+    response = kea_server.dhcp4.network4_del(name=name)
+    assert response.result == 0
