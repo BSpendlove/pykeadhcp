@@ -58,3 +58,8 @@ def test_kea_dhcp6_lease6_get(kea_server: Kea):
 def test_kea_dhcp6_lease6_del(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 0
+
+
+def test_kea_dhcp6_lease6_del_non_existent(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
+    assert response.result == 3
