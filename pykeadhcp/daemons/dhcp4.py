@@ -8,7 +8,6 @@ from pykeadhcp.models.dhcp4.shared_network import SharedNetwork4
 from pykeadhcp.models.dhcp4.subnet import Subnet4
 from pykeadhcp.models.dhcp4.lease import Lease4, Lease4Page
 from pykeadhcp.exceptions import (
-    KeaHookLibraryNotConfiguredException,
     KeaSharedNetworkNotFoundException,
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
