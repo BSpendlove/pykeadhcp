@@ -37,9 +37,6 @@ def test_kea_dhcp6_lease6_add(kea_server: Kea):
     )
     assert lease_response.result == 0
 
-    delete_response = kea_server.dhcp6.subnet6_del(subnet_id=40123)
-    assert delete_response.result == 0
-
 
 def test_kea_dhcp6_lease6_get(kea_server: Kea):
     response = kea_server.dhcp6.lease6_get(ip_address="2001:db8::32")
@@ -75,6 +72,19 @@ def test_kea_dhcp6_lease6_get_by_hostname_non_existent(kea_server: Kea):
         kea_server.dhcp6.lease6_get_by_hostname(hostname="bad-hostname")
 
 
+def test_kea_dhcp6_lease6_update(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_update(
+        ip_address="2001:db8::32",
+        duid="1a:1b:1c:1d:1e:1f:20:21:22:23:25",
+        iaid=1234,
+        hostname="new-hostname",
+    )
+    assert response.result == 0
+
+    updated_lease = kea_server.dhcp6.lease6_get(ip_address="2001:db8::32")
+    assert updated_lease.hostname == "new-hostname"
+
+
 def test_kea_dhcp6_lease6_del(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 0
@@ -83,3 +93,8 @@ def test_kea_dhcp6_lease6_del(kea_server: Kea):
 def test_kea_dhcp6_lease6_del_non_existent(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 3
+
+
+def test_kea_dhcp6_lease6_del_temp_subnet(kea_server: Kea):
+    delete_response = kea_server.dhcp6.subnet6_del(subnet_id=40123)
+    assert delete_response.result == 0

@@ -294,6 +294,28 @@ class Dhcp6:
             required_hook="lease_cmds",
         )
 
+    def lease6_update(
+        self, ip_address: str, duid: str, iaid: int, **kwargs
+    ) -> KeaResponse:
+        """Updates an existing lease
+
+        Args:
+            ip_address:     Lease IPv6 Address
+            duid:           DHCP Unique Identifier
+            iaid:           IAID
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease4-update
+        """
+        lease = Lease6(ip_address=ip_address, duid=duid, iaid=iaid, **kwargs)
+
+        return self.api.send_command_with_arguments(
+            command="lease6-update",
+            service=self.service,
+            arguments=lease.dict(exclude_none=True, by_alias=True),
+            required_hook="lease_cmds",
+        )
+
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
 
