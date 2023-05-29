@@ -92,6 +92,36 @@ from pykeadhcp import Kea
 server = Kea(host="http://localhost", port=8000, use_basic_auth=True, username="your-username", password="your-password")
 ```
 
+## Cached Config
+
+Once you initialize the Kea class, it will automatically attempt to gather the configuration for all daemons and cache them locally as `cached_config` eg. like:
+
+```
+from pykeadhcp import Kea
+
+server = Kea(host="http://localhost", port=8000)
+
+# Control Agent
+print(server.ctrlagent.cached_config)
+
+# Dhcp4
+print(server.dhcp4.cached_config)
+
+# Dhcp6
+print(server.dhcp6.cached_config)
+
+# DDNS
+print(server.ddns.cached_config)
+```
+
+If you make a change via the API that amends the configuration (eg. network4-add), the cached config must be refreshed manually using:
+
+```
+server.dhcp4.refresh_cached_config()
+```
+
+For API calls that don't amend the configuration (eg. lease4-add, lease6-add, config-get, etc....), there is no need to refresh the relevant daemon configuration. Maybe I will add a feature in the future to allow the user to specify if they want the cached_config to be automatically refreshed when a function is called that requires a refresh but for now its manual.
+
 ## API Reference
 
 All supported commands by the daemons are in the format of the API referenced commands with the exception of replacing any hypthen or space with an underscore. Eg. the `build-report` API command for all daemons is implemented as `build_report` so it heavily ties into the Kea predefined commands when looking at their documentation. Currently everything is built towards Kea 2.2.0. Pydantic variables will replace any hyphens with an underscore however when loading/exporting the data models, it will replace all keys with the hyphen to adhere to the Kea expected variables, ensure that the `KeaBaseModel` (located in `from pykeadhcp.models.generic.base import KeaBaseModel` instead of `from pydantic import BaseModel`) is used when creating any Pydantic models to inherit this functionality.

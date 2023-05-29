@@ -21,13 +21,23 @@ class Dhcp4:
 
         # Cache config and hooks
         try:
-            self.cached_config = self.config_get().arguments
+            self.cached_config = None
+            self.refresh_cached_config()
             self.hook_libraries = self.api.get_active_hooks(
                 hooks=self.cached_config[self.service.capitalize()]["hooks-libraries"]
             )
             self.api.hook_library[self.service] = self.hook_libraries
         except:
             pass
+
+    def refresh_cached_config(self):
+        """Sets the cached_config variable
+
+        This function should be called after any interaction with the API that potentially changes the configuration
+        eg. subnet4-add, commands like lease4-add won't need a config refresh to keep the cached config up to date
+        """
+        config = self.config_get()
+        self.cache_config = config.arguments
 
     def build_report(self) -> KeaResponse:
         """Returns list of compilation options that this particular binary was built with
