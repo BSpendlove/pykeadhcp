@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from pykeadhcp import Kea
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
-from pykeadhcp.models.dhcp6.lease import Lease6, Lease6TypeEnum
+from pykeadhcp.models.dhcp6.lease import Lease6, Lease6Page, Lease6TypeEnum
 from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
@@ -210,6 +210,25 @@ class Dhcp6:
 
         leases = [Lease6.parse_obj(lease) for lease in data.arguments["leases"]]
         return leases
+
+    def lease6_get_page(self, limit: int, search_from: str) -> Lease6Page:
+        """Retrieves all IPv4 leases by page
+
+        Args:
+            limit:          Set the limit of IPv4 leases to be returned
+            search_from:    Start from either a specific IP address or 'start' for the first
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-get-page
+        """
+        data = self.api.send_command_with_arguments(
+            command="lease6-get-page",
+            service=self.service,
+            arguments={"from": search_from, "limit": limit},
+            required_hook="lease_cmds",
+        )
+
+        return Lease6Page.parse_obj(data.arguments)
 
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service

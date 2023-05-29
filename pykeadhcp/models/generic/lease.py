@@ -12,3 +12,7 @@ class Lease(KeaBaseModel):
     state: Optional[int]
     subnet_id: Optional[int]
     valid_lft: Optional[int]
+
+
+class LeasePage(KeaBaseModel):
+    count: int
