@@ -150,23 +150,21 @@ class Dhcp4:
         self,
         *,
         ip_address: str,
-        identifier_key: str = "hw-address",
-        identifier_value: str,
+        **kwargs,
     ) -> KeaResponse:
         """Administratively add a new IPv4 lease
 
         Args:
             ip_address:         IPv4 Address of lease
-            identifier_key:     Supported identifier (hw-address, flex-id, etc...)
-            identifier_value:   Value of key (eg. flex-id data or hw-address MAC address)
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease4-add
         """
+        lease = Lease4(ip_address=ip_address, **kwargs)
         return self.api.send_command_with_arguments(
             command="lease4-add",
             service=self.service,
-            arguments={"ip-address": ip_address, identifier_key: identifier_value},
+            arguments=lease.dict(exclude_none=True, by_alias=True),
             required_hook="lease_cmds",
         )
 
