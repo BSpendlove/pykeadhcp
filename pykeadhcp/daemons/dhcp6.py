@@ -152,8 +152,21 @@ class Dhcp6:
             required_hook="subnet_cmds",
         )
 
-    def network6_del(self) -> None:
-        raise NotImplementedError
+    def network6_del(self, name: str) -> KeaResponse:
+        """Deletes an existing shared network
+
+        Args:
+            name:       Name of shared network
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#network6-del
+        """
+        return self.api.send_command_with_arguments(
+            command="network6-del",
+            service=self.service,
+            arguments={"name": name},
+            required_hook="subnet_cmds",
+        )
 
     def network6_get(self, name: str) -> SharedNetwork6:
         """Returns detailed information about a shared network, including subnets
@@ -180,14 +193,57 @@ class Dhcp6:
         shared_network = data.arguments["shared-networks"][0]
         return SharedNetwork6.parse_obj(shared_network)
 
-    def network6_list(self) -> None:
-        raise NotImplementedError
+    def network6_list(self) -> List[SharedNetwork6]:
+        """Returns a full list of the current shared networks configured
 
-    def network6_subnet_add(self) -> None:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#network6-list
+        """
+        data = self.api.send_command(
+            command="network6-list",
+            service=self.service,
+            required_hook="subnet_cmds",
+        )
 
-    def network6_subnet_del(self) -> None:
-        raise NotImplementedError
+        networks = [
+            SharedNetwork6.parse_obj(network)
+            for network in data.arguments["shared-networks"]
+        ]
+        return networks
+
+    def network6_subnet_add(self, name: str, subnet_id: int) -> KeaResponse:
+        """Add an existing subnet to an existing shared network
+
+        Args:
+            name:       Name of shared network
+            subnet_id:  ID of the subnet
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#network6-subnet-add
+        """
+        return self.api.send_command_with_arguments(
+            command="network6-subnet-add",
+            service=self.service,
+            arguments={"name": name, "id": subnet_id},
+            required_hook="subnet_cmds",
+        )
+
+    def network6_subnet_del(self, name: str, subnet_id: int) -> KeaResponse:
+        """Remove a subnet that is part of an existing shared network and demotes it to a plain standalone subnet
+
+        Args:
+            name:       Name of shared network
+            subnet_id:  ID of the subnet
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#network6-subnet-del
+        """
+        return self.api.send_command_with_arguments(
+            command="network6-subnet-del",
+            service=self.service,
+            arguments={"name": name, "id": subnet_id},
+            required_hook="subnet_cmds",
+        )
 
     def shutdown(self) -> KeaResponse:
         """Instructs the server daemon to initiate its shutdown procedure
@@ -230,6 +286,60 @@ class Dhcp6:
         """
         data = self.api.send_command(command="status-get", service=self.service)
         return StatusGet.parse_obj(data.arguments)
+
+    def subnet6_add(self, subnets: List[Subnet6]) -> KeaResponse:
+        """Creates and adds a new subnet
+
+        Args:
+            subnets:        List of subnets to add
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-add
+        """
+        return self.api.send_command_with_arguments(
+            command="subnet6-add",
+            service=self.service,
+            arguments={
+                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+            },
+            required_hook="subnet_cmds",
+        )
+
+    def subnet6_del(self, subnet_id: int) -> KeaResponse:
+        """Removes a subnet
+
+        Args:
+            subnet_id:      ID of the subnet
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-del
+        """
+        data = self.api.send_command_with_arguments(
+            command="subnet6-del",
+            service=self.service,
+            arguments={"id": subnet_id},
+            required_hook="subnet_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(subnet_id)
+
+        return data
+
+    def subnet6_delta_add(self) -> None:
+        raise NotImplementedError
+
+    def subnet6_delta_del(self) -> None:
+        raise NotImplementedError
+
+    def subnet6_get(self) -> None:
+        raise NotImplementedError
+
+    def subnet6_list(self) -> None:
+        raise NotImplementedError
+
+    def subnet6_update(self) -> None:
+        raise NotImplementedError
 
     def version_get(self) -> KeaResponse:
         """Returns extended information about the Kea Version that is running
