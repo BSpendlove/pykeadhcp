@@ -13,9 +13,9 @@ class CtrlAgent:
 
         # Cache config and hooks
         try:
-            self.cached_config = self.config_get().arguments["Control-agent"]
+            self.cached_config = self.config_get().arguments
             self.hook_libraries = self.api.get_active_hooks(
-                hooks=self.cached_config["hooks-libraries"]
+                hooks=self.cached_config["Control-agent"]["hooks-libraries"]
             )
             self.api.hook_library[self.service] = self.hook_libraries
         except:

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pykeadhcp import Kea
 
-from pykeadhcp.models.generic import KeaResponse
+from pykeadhcp.models.generic import KeaResponse, StatusGet
 
 
 class Dhcp6:
@@ -13,9 +13,9 @@ class Dhcp6:
 
         # Cache config and hooks
         try:
-            self.cached_config = self.config_get().arguments[self.service.capitalize()]
+            self.cached_config = self.config_get().arguments
             self.hook_libraries = self.api.get_active_hooks(
-                hooks=self.cached_config["hooks-libraries"]
+                hooks=self.cached_config[self.service.capitalize()]["hooks-libraries"]
             )
             self.api.hook_library[self.service] = self.hook_libraries
         except:
@@ -86,6 +86,31 @@ class Dhcp6:
             arguments={"filename": filename},
         )
 
+    def dhcp_disable(self, max_period: int = 20) -> KeaResponse:
+        """Globally disables DHCP service (dhcp4)
+
+        Args:
+            max_period:     Time until DHCP service is automatically renabled in seconds
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-dhcp-disable
+        """
+        return self.api.send_command_with_arguments(
+            command="dhcp-disable",
+            service=self.service,
+            arguments={"max-period": max_period, "origin": "user"},
+        )
+
+    def dhcp_enable(self) -> KeaResponse:
+        """Globally enables the DHCP service (dhcp4)
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/arm/ctrl-channel.html#the-dhcp-enable-command
+        """
+        return self.api.send_command_with_arguments(
+            command="dhcp-enable", service=self.service, arguments={"origin": "user"}
+        )
+
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
 
@@ -94,6 +119,34 @@ class Dhcp6:
         """
         return self.api.send_command_with_arguments(
             command="list-commands", service=self.service, arguments={}
+        )
+
+    def network6_add(self) -> None:
+        raise NotImplementedError
+
+    def network6_del(self) -> None:
+        raise NotImplementedError
+
+    def network6_get(self) -> None:
+        raise NotImplementedError
+
+    def network6_list(self) -> None:
+        raise NotImplementedError
+
+    def network6_subnet_add(self) -> None:
+        raise NotImplementedError
+
+    def network6_subnet_del(self) -> None:
+        raise NotImplementedError
+
+    def shutdown(self) -> KeaResponse:
+        """Instructs the server daemon to initiate its shutdown procedure
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-shutdown
+        """
+        return self.api.send_command_with_arguments(
+            command="shutdown", service=self.service, arguments={"exit-value": 3}
         )
 
     def statistic_get(self, name: str) -> KeaResponse:
@@ -118,3 +171,20 @@ class Dhcp6:
         return self.api.send_command_with_arguments(
             command="statistic-get-all", service=self.service, arguments={}
         )
+
+    def status_get(self) -> StatusGet:
+        """Returns servers runtime information
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-status-get
+        """
+        data = self.api.send_command(command="status-get", service=self.service)
+        return StatusGet.parse_obj(data.arguments)
+
+    def version_get(self) -> KeaResponse:
+        """Returns extended information about the Kea Version that is running
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-version-get
+        """
+        return self.api.send_command(command="version-get", service=self.service)

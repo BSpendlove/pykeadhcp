@@ -1,15 +1,20 @@
 from typing import Optional, List, Union
+from pydantic import conint
 from pykeadhcp.models.generic.base import KeaBaseModel
+from pykeadhcp.models.generic.option_data import OptionData
 from pykeadhcp.models.enums import ReservationMode, DDNSReplaceClientNameEnum
 
 
 class CommonDHCPParams(KeaBaseModel):
-    """Any param shared between Shared Network and Subnets"""
+    """Any param shared between v4/v6 Shared Networks and Subnets"""
 
+    valid_lifetime: Optional[int]
+    min_valid_lifetime: Optional[int]
+    max_valid_lifetime: Optional[int]
     interface: Optional[str]
     renew_timer: Optional[int]
     rebind_timer: Optional[int]
-    option_data_list: Optional[List[dict]]
+    option_data: Optional[List[OptionData]]
     client_class: Optional[str]
     require_client_classes: Optional[List[str]]
     reservation_mode: Optional[ReservationMode]

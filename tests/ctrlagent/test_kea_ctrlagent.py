@@ -13,6 +13,26 @@ def test_kea_ctrlagent_config_get(kea_server: Kea):
     assert response.arguments
 
 
+def test_kea_ctrlagent_config_test(kea_server: Kea):
+    config = kea_server.ctrlagent.cached_config
+    response = kea_server.ctrlagent.config_test(config=config)
+    assert response.result == 0
+
+
+def test_kea_ctrlagent_config_set(kea_server: Kea):
+    config = kea_server.ctrlagent.cached_config
+    response = kea_server.ctrlagent.config_set(config=config)
+    assert response.result == 0
+
+
+def test_kea_ctrlagent_config_write(kea_server: Kea):
+    filename = "/usr/local/etc/kea/kea-ctrl-agent.conf"
+    response = kea_server.ctrlagent.config_write(filename=filename)
+    assert response.result == 0
+    assert response.arguments["filename"] == filename
+    assert response.arguments["size"] > 0
+
+
 def test_kea_ctrlagent_config_reload(kea_server: Kea):
     response = kea_server.ctrlagent.config_reload()
     assert response.result == 0

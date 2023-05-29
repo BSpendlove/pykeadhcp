@@ -10,9 +10,9 @@ On each major pull request which changes the logic of any code, you must provide
 | build-report | :white_check_mark: | :white_check_mark: |
 | config-get | :white_check_mark: | :white_check_mark: |
 | config-reload | :white_check_mark: | :white_check_mark: |
-| config-set | :white_check_mark: | - |
-| config-test | :white_check_mark: | - |
-| config-write | :white_check_mark: | - |
+| config-set | :white_check_mark: | :white_check_mark: |
+| config-test | :white_check_mark: | :white_check_mark: |
+| config-write | :white_check_mark: | :white_check_mark: |
 | list-commands | :white_check_mark: | :white_check_mark: |
 | shutdown | :white_check_mark: | :white_check_mark: |
 | status-get | :white_check_mark: | :white_check_mark: |
@@ -69,9 +69,9 @@ On each major pull request which changes the logic of any code, you must provide
 | config-backend-pull | - | - |
 | config-get | :white_check_mark: | :white_check_mark: |
 | config-reload | :white_check_mark: | :white_check_mark: |
-| config-set | :white_check_mark: | - |
-| config-test | :white_check_mark: | - |
-| config-write | :white_check_mark: | - |
+| config-set | :white_check_mark: | :white_check_mark: |
+| config-test | :white_check_mark: | :white_check_mark: |
+| config-write | :white_check_mark: | :white_check_mark: |
 | dhcp-disable | :white_check_mark: | :white_check_mark: |
 | dhcp-enable | :white_check_mark: | :white_check_mark: |
 | ha-continue | - | - |
@@ -173,7 +173,7 @@ On each major pull request which changes the logic of any code, you must provide
 
 | Command | Implemented | Test Implemented |
 | --- | --- | --- |
-| build-report | - | - |
+| build-report | :white_check_mark: | :white_check_mark: |
 | cache-clear | - | - |
 | cache-flush | - | - |
 | cache-get | - | - |
@@ -189,13 +189,13 @@ On each major pull request which changes the logic of any code, you must provide
 | class-list | - | - |
 | class-update | - | - |
 | config-backend-pull | - | - |
-| config-get | - | - |
-| config-reload | - | - |
-| config-set | - | - |
-| config-test | - | - |
-| config-write | - | - |
-| dhcp-disable | - | - |
-| dhcp-enable | - | - |
+| config-get | :white_check_mark: | :white_check_mark: |
+| config-reload | :white_check_mark: | :white_check_mark: |
+| config-set | :white_check_mark: | :white_check_mark: |
+| config-test | :white_check_mark: | :white_check_mark: |
+| config-write | :white_check_mark: | :white_check_mark: |
+| dhcp-disable | :white_check_mark: | :white_check_mark: |
+| dhcp-enable | :white_check_mark: | :white_check_mark: |
 | ha-continue | - | - |
 | ha-heartbeat | - | - |
 | ha-maintenance-cancel | - | - |
@@ -218,7 +218,7 @@ On each major pull request which changes the logic of any code, you must provide
 | lease6-wipe | - | - |
 | leases-reclaim | - | - |
 | libreload | - | - |
-| list-commands | - | - |
+| list-commands | :white_check_mark: | :white_check_mark: |
 | network6-add | - | - |
 | network6-del | - | - |
 | network6-get | - | - |
@@ -271,7 +271,7 @@ On each major pull request which changes the logic of any code, you must provide
 | reservation-get-by-id | - | - |
 | reservation-get-page | - | - |
 | server-tag-get | - | - |
-| shutdown | - | - |
+| shutdown | :white_check_mark: | :white_check_mark: |
 | stat-lease6-get | - | - |
 | statistic-get | - | - |
 | statistic-get-all | - | - |
@@ -283,7 +283,7 @@ On each major pull request which changes the logic of any code, you must provide
 | statistic-sample-age-set-all | - | - |
 | statistic-sample-count-set | - | - |
 | statistic-sample-count-set-all | - | - |
-| status-get | - | - |
+| status-get | :white_check_mark: | :white_check_mark: |
 | subnet6-add | - | - |
 | subnet6-del | - | - |
 | subnet6-delta-add | - | - |
@@ -291,4 +291,4 @@ On each major pull request which changes the logic of any code, you must provide
 | subnet6-get | - | - |
 | subnet6-list | - | - |
 | subnet6-update | - | - |
-| version-get | - | - |
+| version-get | :white_check_mark: | :white_check_mark: |

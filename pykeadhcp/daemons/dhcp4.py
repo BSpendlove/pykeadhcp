@@ -22,9 +22,9 @@ class Dhcp4:
 
         # Cache config and hooks
         try:
-            self.cached_config = self.config_get().arguments[self.service.capitalize()]
+            self.cached_config = self.config_get().arguments
             self.hook_libraries = self.api.get_active_hooks(
-                hooks=self.cached_config["hooks-libraries"]
+                hooks=self.cached_config[self.service.capitalize()]["hooks-libraries"]
             )
             self.api.hook_library[self.service] = self.hook_libraries
         except:
