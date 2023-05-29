@@ -122,11 +122,7 @@ class Dhcp6:
         )
 
     def lease6_add(
-        self,
-        *,
-        ip_address: str,
-        duid: str,
-        iaid: int,
+        self, *, ip_address: str, duid: str, iaid: int, **kwargs
     ) -> KeaResponse:
         """Administratively add a new IPv6 lease
 
@@ -138,7 +134,7 @@ class Dhcp6:
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-add
         """
-        lease = Lease6(ip_address=ip_address, duid=duid, iaid=iaid)
+        lease = Lease6(ip_address=ip_address, duid=duid, iaid=iaid, **kwargs)
 
         return self.api.send_command_with_arguments(
             command="lease6-add",
