@@ -33,9 +33,7 @@ def test_kea_dhcp4_lease4_add(kea_server: Kea):
 
     # Add Lease
     lease_response = kea_server.dhcp4.lease4_add(
-        ip_address="192.0.2.32",
-        identifier_key="hw-address",
-        identifier_value="aa:bb:cc:11:22:33",
+        ip_address="192.0.2.32", hw_address="aa:bb:cc:11:22:33"
     )
 
     assert lease_response.result == 0
