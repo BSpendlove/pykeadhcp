@@ -60,3 +60,8 @@ def test_kea_dhcp6_subnet6_update(kea_server: Kea):
 def test_kea_dhcp6_subnet6_del(kea_server: Kea):
     response = kea_server.dhcp6.subnet6_del(subnet_id=40123)
     assert response.result == 0
+
+
+def test_kea_dhcp6_subnet6_del_non_existent(kea_server: Kea):
+    with pytest.raises(KeaSubnetNotFoundException):
+        kea_server.dhcp6.subnet6_del(subnet_id=40123)
