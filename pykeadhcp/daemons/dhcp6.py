@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from pykeadhcp import Kea
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
-from pykeadhcp.models.dhcp6.lease import Lease6
+from pykeadhcp.models.dhcp6.lease import Lease6, Lease6TypeEnum
 from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
@@ -121,6 +121,31 @@ class Dhcp6:
         return self.api.send_command_with_arguments(
             command="dhcp-enable", service=self.service, arguments={"origin": "user"}
         )
+
+    def lease6_get(self, ip_address: str, type: Lease6TypeEnum = None) -> Lease6:
+        """Queries the lease database and retrieves existing lease
+
+        Args:
+            ip_address:     IP address of lease
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease4-get
+        """
+        payload = {"ip-address": ip_address}
+        if type:
+            payload.update["type"] = type
+
+        data = self.api.send_command_with_arguments(
+            command="lease6-get",
+            service=self.service,
+            arguments=payload,
+            required_hook="lease_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaLeaseNotFoundException(ip_address)
+
+        return Lease6.parse_obj(data.arguments)
 
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
