@@ -430,11 +430,6 @@ class Dhcp4:
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-network4-add
         """
-        if not self.api.is_hook_enabled("subnet_cmds", self.hook_libraries):
-            raise KeaHookLibraryNotConfiguredException(
-                service=self.service, hook="subnet_cmds"
-            )
-
         return self.api.send_command_with_arguments(
             command="network4-add",
             service=self.service,
@@ -443,6 +438,7 @@ class Dhcp4:
                     network.dict(exclude_none=True) for network in shared_networks
                 ]
             },
+            required_hook="subnet_cmds",
         )
 
     def network4_del(self, name: str) -> KeaResponse:
@@ -454,13 +450,11 @@ class Dhcp4:
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#network4-del
         """
-        if not self.api.is_hook_enabled("subnet_cmds", self.hook_libraries):
-            raise KeaHookLibraryNotConfiguredException(
-                service=self.service, hook="subnet_cmds"
-            )
-
         return self.api.send_command_with_arguments(
-            command="network4-del", service=self.service, arguments={"name": name}
+            command="network4-del",
+            service=self.service,
+            arguments={"name": name},
+            required_hook="subnet_cmds",
         )
 
     def network4_get(self, name: str) -> SharedNetwork4:
