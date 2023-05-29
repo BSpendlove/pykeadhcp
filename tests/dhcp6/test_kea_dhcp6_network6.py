@@ -17,6 +17,12 @@ list
 """
 
 
+def test_kea_dhcp6_network6_get_non_existent(kea_server: Kea):
+    name = "pykeadhcp-pytest"
+    with pytest.raises(KeaSharedNetworkNotFoundException):
+        response = kea_server.dhcp6.network6_get(name=name)
+
+
 def test_kea_dhcp6_network6_add(kea_server: Kea):
     name = "pykeadhcp-pytest"
     data = SharedNetwork6(name=name)
@@ -25,35 +31,22 @@ def test_kea_dhcp6_network6_add(kea_server: Kea):
     assert response.result == 0
 
 
-"""
-def test_kea_dhcp4_network4_get_non_existent(kea_server: Kea):
+def test_kea_dhcp6_network6_add_duplicate(kea_server: Kea):
     name = "pykeadhcp-pytest"
-    with pytest.raises(KeaSharedNetworkNotFoundException):
-        response = kea_server.dhcp4.network4_get(name=name)
-
-
-def test_kea_dhcp4_network4_add(kea_server: Kea):
-    name = "pykeadhcp-pytest"
-    data = SharedNetwork4(name=name)
+    data = SharedNetwork6(name=name)
     shared_networks = [data]
-    response = kea_server.dhcp4.network4_add(shared_networks)
-    assert response.result == 0
-
-
-def test_kea_dhcp4_network4_add_duplicate(kea_server: Kea):
-    name = "pykeadhcp-pytest"
-    data = SharedNetwork4(name=name)
-    shared_networks = [data]
-    response = kea_server.dhcp4.network4_add(shared_networks)
+    response = kea_server.dhcp6.network6_add(shared_networks)
     assert response.result == 1
 
 
-def test_kea_dhcp4_network4_get(kea_server: Kea):
+def test_kea_dhcp6_network6_get(kea_server: Kea):
     name = "pykeadhcp-pytest"
-    response = kea_server.dhcp4.network4_get(name=name)
+    response = kea_server.dhcp6.network6_get(name=name)
     assert response
     assert response.name == name
 
+
+"""
 
 def test_kea_dhcp4_network4_subnet_add(kea_server: Kea):
     name = "pykeadhcp-pytest"

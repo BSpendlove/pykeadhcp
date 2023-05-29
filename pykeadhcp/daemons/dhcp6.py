@@ -9,6 +9,12 @@ from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
 from pykeadhcp.models.dhcp6.subnet import Subnet6
+from pykeadhcp.exceptions import (
+    KeaHookLibraryNotConfiguredException,
+    KeaSharedNetworkNotFoundException,
+    KeaSubnetNotFoundException,
+    KeaLeaseNotFoundException,
+)
 
 
 class Dhcp6:
@@ -149,8 +155,30 @@ class Dhcp6:
     def network6_del(self) -> None:
         raise NotImplementedError
 
-    def network6_get(self) -> None:
-        raise NotImplementedError
+    def network6_get(self, name: str) -> SharedNetwork6:
+        """Returns detailed information about a shared network, including subnets
+
+        Args:
+            name:       Name of shared network
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#network6-get
+        """
+        data = self.api.send_command_with_arguments(
+            command="network6-get",
+            service=self.service,
+            arguments={"name": name},
+            required_hook="subnet_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaSharedNetworkNotFoundException(name)
+
+        if not data.arguments["shared-networks"]:
+            return None
+
+        shared_network = data.arguments["shared-networks"][0]
+        return SharedNetwork6.parse_obj(shared_network)
 
     def network6_list(self) -> None:
         raise NotImplementedError
