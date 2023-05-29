@@ -326,11 +326,41 @@ class Dhcp6:
 
         return data
 
-    def subnet6_delta_add(self) -> None:
-        raise NotImplementedError
+    def subnet6_delta_add(self, subnets: List[Subnet6]) -> KeaResponse:
+        """Updates (adds or overwrites) parts of a single subnet
 
-    def subnet6_delta_del(self) -> None:
-        raise NotImplementedError
+        Args:
+            subnets:        List of subnets to update/add
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-delta-add
+        """
+        return self.api.send_command_with_arguments(
+            command="subnet6-delta-add",
+            service=self.service,
+            arguments={
+                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+            },
+            required_hook="subnet_cmds",
+        )
+
+    def subnet6_delta_del(self, subnets: List[Subnet6]) -> KeaResponse:
+        """Updates (removes) parts of a single subnet
+
+        Args:
+            subnets:        List of subnets to update/delete
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-delta-del
+        """
+        return self.api.send_command_with_arguments(
+            command="subnet6-delta-del",
+            service=self.service,
+            arguments={
+                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+            },
+            required_hook="subnet_cmds",
+        )
 
     def subnet6_get(self, subnet_id: int) -> Subnet6:
         """Gets detailed information about the specified subnet
