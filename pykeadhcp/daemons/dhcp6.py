@@ -372,8 +372,23 @@ class Dhcp6:
         subnets = [Subnet6.parse_obj(subnet) for subnet in data.arguments["subnets"]]
         return subnets
 
-    def subnet6_update(self) -> None:
-        raise NotImplementedError
+    def subnet6_update(self, subnets: List[Subnet6]) -> List[Subnet6]:
+        """Updates (overwrites) a single subnet
+
+        Args:
+            subnets:        List of subnets to overwrite
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-update
+        """
+        return self.api.send_command_with_arguments(
+            command="subnet6-update",
+            service=self.service,
+            arguments={
+                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+            },
+            required_hook="subnet_cmds",
+        )
 
     def version_get(self) -> KeaResponse:
         """Returns extended information about the Kea Version that is running
