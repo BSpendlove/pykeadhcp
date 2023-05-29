@@ -278,6 +278,22 @@ class Dhcp6:
 
         return Lease6Page.parse_obj(data.arguments)
 
+    def lease6_resend_ddns(self, ip_address: str) -> KeaResponse:
+        """Sends an internal request to the ddns daemon to update DNS for an existing lease
+
+        Args:
+            ip_address:     Lease to update DDNS record
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-resend-ddns
+        """
+        return self.api.send_command_with_arguments(
+            command="lease6-resend-ddns",
+            service=self.service,
+            arguments={"ip-address": ip_address},
+            required_hook="lease_cmds",
+        )
+
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
 
