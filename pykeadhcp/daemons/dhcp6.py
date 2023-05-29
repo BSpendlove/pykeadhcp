@@ -357,8 +357,20 @@ class Dhcp6:
         subnet = data.arguments["subnet4"][0]
         return Subnet6.parse_obj(subnet)
 
-    def subnet6_list(self) -> None:
-        raise NotImplementedError
+    def subnet6_list(self) -> List[Subnet6]:
+        """List all currently configured subnets
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-list
+        """
+        data = self.api.send_command(
+            command="subnet6-list",
+            service=self.service,
+            required_hook="subnet_cmds",
+        )
+
+        subnets = [Subnet6.parse_obj(subnet) for subnet in data.arguments["subnets"]]
+        return subnets
 
     def subnet6_update(self) -> None:
         raise NotImplementedError

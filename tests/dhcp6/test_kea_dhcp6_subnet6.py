@@ -33,3 +33,8 @@ def test_kea_dhcp6_subnet6_add_existing(kea_server: Kea):
     subnets = [data]
     response = kea_server.dhcp6.subnet6_add(subnets=subnets)
     assert response.result == 1
+
+
+def test_kea_dhcp6_subnet6_list(kea_server: Kea):
+    response = kea_server.dhcp6.subnet6_list()
+    assert response
