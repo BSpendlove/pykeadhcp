@@ -16,7 +16,7 @@ jobs:
           python-version: 3.10
       - uses: psf/black@stable
         with:
-          options: "--check --verbose --diff --color --exclude '\.venv/|\.local/|\.cache/|\.git/'"
+          options: "--check --verbose"
       - name: Run image
         uses: abatilo/actions-poetry@v2
         with:
