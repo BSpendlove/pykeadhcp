@@ -8,3 +8,4 @@ def normalize_keys(string: str) -> str:
 class KeaBaseModel(BaseModel):
     class Config:
         alias_generator = normalize_keys
+        allow_population_by_field_name = True
