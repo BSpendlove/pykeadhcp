@@ -7,4 +7,4 @@ class Lease6(Lease):
     duid: str
     iaid: int
     prefix_len: Optional[int]
-    type: Lease6TypeEnum
+    type: Optional[Lease6TypeEnum]
