@@ -29,4 +29,4 @@ jobs:
       - name: Build Poetry
         run: poetry build
       - name: Publish Package
-        run: poetry publish --repository test-pypi -u __token__ -p ${TEST_PYPI_TOKEN}
+        run: poetry publish --repository test-pypi -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}

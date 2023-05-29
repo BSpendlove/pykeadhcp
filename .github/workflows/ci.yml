@@ -29,6 +29,6 @@ jobs:
         - name: Build Poetry
           run: poetry build
         - name: Publish Package
-          run: poetry publish -u __token__ -p ${PYPI_API_TOKEN}
+          run: poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
         
 
