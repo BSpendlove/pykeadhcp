@@ -39,3 +39,16 @@ def test_kea_dhcp6_lease6_add(kea_server: Kea):
 
     delete_response = kea_server.dhcp6.subnet6_del(subnet_id=40123)
     assert delete_response.result == 0
+
+
+def test_kea_dhcp6_lease6_get(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_get(ip_address="2001:db8::32")
+    assert response
+    assert response.ip_address == "2001:db8::32"
+    assert response.duid == "1a:1b:1c:1d:1e:1f:20:21:22:23:24"
+    assert response.iaid == 1234
+
+
+def test_kea_dhcp6_lease6_del(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
+    assert response.result == 0

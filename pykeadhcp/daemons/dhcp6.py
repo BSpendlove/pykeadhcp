@@ -144,7 +144,23 @@ class Dhcp6:
         return self.api.send_command_with_arguments(
             command="lease6-add",
             service=self.service,
-            arguments=lease.dict(exclude_none=True),
+            arguments=lease.dict(exclude_none=True, by_alias=True),
+            required_hook="lease_cmds",
+        )
+
+    def lease6_del(self, ip_address: str) -> KeaResponse:
+        """Deletes a lease from the lease database
+
+        Args:
+            ip_address:     IP address of lease to delete
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-del
+        """
+        return self.api.send_command_with_arguments(
+            command="lease6-del",
+            service=self.service,
+            arguments={"ip-address": ip_address},
             required_hook="lease_cmds",
         )
 
