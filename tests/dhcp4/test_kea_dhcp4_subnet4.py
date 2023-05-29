@@ -46,35 +46,35 @@ def test_kea_dhcp4_subnet4_get(kea_server: Kea):
     assert response.id == 40123
 
 
-# def test_kea_dhcp4_subnet4_delta_add(kea_server: Kea):
-#    data = Subnet4(
-#        id=40123,
-#        subnet="192.0.2.32/31",
-#        min_valid_lifetime=5000,
-#        max_valid_lifetime=7000,
-#        option_data=[{"code": 3, "data": "192.0.2.32"}],
-#     )
-#    subnets = [data]
+def test_kea_dhcp4_subnet4_delta_add(kea_server: Kea):
+    data = Subnet4(
+        id=40123,
+        subnet="192.0.2.32/31",
+        min_valid_lifetime=5000,
+        max_valid_lifetime=7000,
+        option_data=[{"code": 3, "data": "192.0.2.32"}],
+    )
+    subnets = [data]
 
-#    response = kea_server.dhcp4.subnet4_delta_add(subnets=subnets)
-#    assert response.result == 0
+    response = kea_server.dhcp4.subnet4_delta_add(subnets=subnets)
+    assert response.result == 0
 
 
-# def test_kea_dhcp4_subnet4_delta_delete(kea_server: Kea):
-#    data = Subnet4(
-#        id=40123,
-#        subnet="192.0.2.32/31",
-#        min_valid_lifetime=5000,
-#        max_valid_lifetime=7000,
-#        option_data=[{"code": 3, "data": "192.0.2.32"}],
-#    )
-#    subnets = [data]
-#    response = kea_server.dhcp4.subnet4_delta_del(subnets=subnets)
-#    assert response.result == 0
+def test_kea_dhcp4_subnet4_delta_delete(kea_server: Kea):
+    data = Subnet4(
+        id=40123,
+        subnet="192.0.2.32/31",
+        min_valid_lifetime=5000,
+        max_valid_lifetime=7000,
+        option_data=[{"code": 3, "data": "192.0.2.32"}],
+    )
+    subnets = [data]
+    response = kea_server.dhcp4.subnet4_delta_del(subnets=subnets)
+    assert response.result == 0
 
-#    updated_subnet = kea_server.dhcp4.subnet4_get(subnet_id=40123)
-#    assert updated_subnet
-#    assert updated_subnet.max_valid_lifetime != 7000
+    updated_subnet = kea_server.dhcp4.subnet4_get(subnet_id=40123)
+    assert updated_subnet
+    assert updated_subnet.max_valid_lifetime != 7000
 
 
 def test_kea_dhcp4_subnet4_update(kea_server: Kea):
