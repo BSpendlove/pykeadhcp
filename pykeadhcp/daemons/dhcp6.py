@@ -351,10 +351,10 @@ class Dhcp6:
         if data.result == 3:
             raise KeaSubnetNotFoundException(subnet_id)
 
-        if not data.arguments["subnet4"]:
+        if not data.arguments["subnet6"]:
             return None
 
-        subnet = data.arguments["subnet4"][0]
+        subnet = data.arguments["subnet6"][0]
         return Subnet6.parse_obj(subnet)
 
     def subnet6_list(self) -> List[Subnet6]:
