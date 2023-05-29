@@ -20,7 +20,7 @@ jobs:
       - name: Run image
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: 1.5.1
+          poetry-version: "1.5.1"
       - name: Configure Poetry
         run: poetry config repositories.test-pypi https://test.pypi.org/legacy/
       - name: Build Poetry
