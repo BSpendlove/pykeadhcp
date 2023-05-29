@@ -122,6 +122,32 @@ class Dhcp6:
             command="dhcp-enable", service=self.service, arguments={"origin": "user"}
         )
 
+    def lease6_add(
+        self,
+        *,
+        ip_address: str,
+        duid: str,
+        iaid: int,
+    ) -> KeaResponse:
+        """Administratively add a new IPv6 lease
+
+        Args:
+            ip_address:         IPv6 Address of lease
+            duid:               DHCP Unique Identifier
+            iaid:               Identity Assosication Identifer
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-add
+        """
+        lease = Lease6(ip_address=ip_address, duid=duid, iaid=iaid)
+
+        return self.api.send_command_with_arguments(
+            command="lease6-add",
+            service=self.service,
+            arguments=lease.dict(exclude_none=True),
+            required_hook="lease_cmds",
+        )
+
     def lease6_get(self, ip_address: str, type: Lease6TypeEnum = None) -> Lease6:
         """Queries the lease database and retrieves existing lease
 
