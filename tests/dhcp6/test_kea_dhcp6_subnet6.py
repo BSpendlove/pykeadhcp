@@ -46,23 +46,23 @@ def test_kea_dhcp6_subnet6_get(kea_server: Kea):
     assert response.id == 40123
 
 
-# def test_kea_dhcp6_subnet6_delta_update(kea_server: Kea):
-#     data = Subnet6(id=40123, subnet="2001:db8::/64", comment="pykeadhcp-test")
-#     subnets = [data]
-#
-#     response = kea_server.dhcp6.subnet6_delta_add(subnets=subnets)
-#     assert response.result == 0
-#
-#
-# def test_kea_dhcp6_subnet6_delta_del(kea_server: Kea):
-#     data = Subnet6(id=40123, subnet="2001:db8::/64", comment="pykeadhcp-test")
-#     subnets = [data]
-#     response = kea_server.dhcp6.subnet6_delta_del(subnets=subnets)
-#     assert response.result == 0
-#
-#     updated_subnet = kea_server.dhcp6.subnet6_get(subnet_id=40123)
-#     assert updated_subnet
-#     assert updated_subnet.comment == ""
+def test_kea_dhcp6_subnet6_delta_update(kea_server: Kea):
+    data = Subnet6(id=40123, subnet="2001:db8::/64", comment="pykeadhcp-test")
+    subnets = [data]
+
+    response = kea_server.dhcp6.subnet6_delta_add(subnets=subnets)
+    assert response.result == 0
+
+
+def test_kea_dhcp6_subnet6_delta_del(kea_server: Kea):
+    data = Subnet6(id=40123, subnet="2001:db8::/64", comment="pykeadhcp-test")
+    subnets = [data]
+    response = kea_server.dhcp6.subnet6_delta_del(subnets=subnets)
+    assert response.result == 0
+
+    updated_subnet = kea_server.dhcp6.subnet6_get(subnet_id=40123)
+    assert updated_subnet
+    assert updated_subnet.comment == ""
 
 
 def test_kea_dhcp6_subnet6_update(kea_server: Kea):
