@@ -1,6 +1,6 @@
 from pykeadhcp import Kea
-from pykeadhcp.models.dhcp4.shared_network import SharedNetwork4
-from pykeadhcp.models.dhcp4.subnet import Subnet4
+from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
+from pykeadhcp.models.dhcp6.subnet import Subnet6
 from pykeadhcp.exceptions import KeaSharedNetworkNotFoundException
 import pytest
 
@@ -15,6 +15,15 @@ update (full update without option 3... should disappear)
 del
 list
 """
+
+
+def test_kea_dhcp6_network6_add(kea_server: Kea):
+    name = "pykeadhcp-pytest"
+    data = SharedNetwork6(name=name)
+    shared_networks = [data]
+    response = kea_server.dhcp6.network6_add(shared_networks=shared_networks)
+    assert response.result == 0
+
 
 """
 def test_kea_dhcp4_network4_get_non_existent(kea_server: Kea):

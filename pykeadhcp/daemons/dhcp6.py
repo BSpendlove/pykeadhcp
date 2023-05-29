@@ -1,9 +1,14 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from pykeadhcp import Kea
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
+from pykeadhcp.models.dhcp6.lease import Lease6
+from pykeadhcp.models.dhcp6.pd_pool import PDPool
+from pykeadhcp.models.dhcp6.reservation import Reservation6
+from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
+from pykeadhcp.models.dhcp6.subnet import Subnet6
 
 
 class Dhcp6:
@@ -121,8 +126,25 @@ class Dhcp6:
             command="list-commands", service=self.service, arguments={}
         )
 
-    def network6_add(self) -> None:
-        raise NotImplementedError
+    def network6_add(self, shared_networks: List[SharedNetwork6]) -> KeaResponse:
+        """Adds new shared networks
+
+        Args:
+            shared_networks:        List of Shared Networks to add
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-network6-add
+        """
+        return self.api.send_command_with_arguments(
+            command="network6-add",
+            service=self.service,
+            arguments={
+                "shared-networks": [
+                    network.dict(exclude_none=True) for network in shared_networks
+                ]
+            },
+            required_hook="subnet_cmds",
+        )
 
     def network6_del(self) -> None:
         raise NotImplementedError
