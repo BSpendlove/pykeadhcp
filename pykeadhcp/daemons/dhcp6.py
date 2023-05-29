@@ -205,8 +205,6 @@ class Dhcp6:
             required_hook="lease_cmds",
         )
 
-        print(data)
-
         if data.result == 3:
             raise KeaLeaseNotFoundException(data.text)
 
