@@ -332,40 +332,20 @@ class Dhcp4:
             required_hook="lease_cmds",
         )
 
-    def lease4_update(
-        self,
-        ip_address: str,
-        hostname: str = "",
-        hw_address: str = "",
-        subnet_id: int = None,
-        force_create: bool = None,
-    ) -> KeaResponse:
+    def lease4_update(self, ip_address: str, **kwargs) -> KeaResponse:
         """Updates an existing lease
 
         Args:
             ip_address:     Lease IPv4 Address
-            hostname:       Hostname of lease
-            hw_address:     Ethernet MAC address
-            subnet_id:      ID of the subnet
-            force_create:   Creates the lease if it doesn't exist
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease4-update
         """
-        payload = {"ip-address": ip_address}
-        if hostname:
-            payload["hostname"] = hostname
-        if hw_address:
-            payload["hw-address"] = hw_address
-        if subnet_id:
-            payload["subnet-id"] = subnet_id
-        if force_create:
-            payload["force-create"] = force_create
-
+        lease = Lease4(ip_address=ip_address, **kwargs)
         return self.api.send_command_with_arguments(
             command="lease4-update",
             service=self.service,
-            arguments=payload,
+            arguments=lease.dict(exclude_none=True, by_alias=True),
             required_hook="lease_cmds",
         )
 
