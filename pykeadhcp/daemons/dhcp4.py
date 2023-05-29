@@ -550,19 +550,9 @@ class Dhcp4:
         raise NotImplementedError
 
     def reservation_get_by_id(self) -> KeaResponse:
-        if not self.api.is_hook_enabled("host_cmds", self.hook_libraries):
-            raise KeaHookLibraryNotConfiguredException(
-                service=self.service, hook="host_cmds"
-            )
-
         raise NotImplementedError
 
     def reservation_get_page(self) -> KeaResponse:
-        if not self.api.is_hook_enabled("host_cmds", self.hook_libraries):
-            raise KeaHookLibraryNotConfiguredException(
-                service=self.service, hook="host_cmds"
-            )
-
         raise NotImplementedError
 
     def server_tag_get(self) -> KeaResponse:

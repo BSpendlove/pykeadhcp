@@ -10,7 +10,6 @@ from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
 from pykeadhcp.models.dhcp6.subnet import Subnet6
 from pykeadhcp.exceptions import (
-    KeaHookLibraryNotConfiguredException,
     KeaSharedNetworkNotFoundException,
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
