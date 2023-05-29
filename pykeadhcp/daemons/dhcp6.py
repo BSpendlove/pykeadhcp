@@ -189,6 +189,30 @@ class Dhcp6:
 
         return Lease6.parse_obj(data.arguments)
 
+    def lease6_get_all(self, subnets: List[int] = []) -> List[Lease6]:
+        """Retrieves all IPv4 leases or all leases for the specified subnets
+
+        Args:
+            subnets:        List of subnet IDs to fetch leases for
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-get-all
+        """
+        data = self.api.send_command_with_arguments(
+            command="lease6-get-all",
+            service=self.service,
+            arguments={"subnets": subnets},
+            required_hook="lease_cmds",
+        )
+
+        print(data)
+
+        if data.result == 3:
+            raise KeaLeaseNotFoundException(data.text)
+
+        leases = [Lease6.parse_obj(lease) for lease in data.arguments["leases"]]
+        return leases
+
     def list_commands(self) -> KeaResponse:
         """List all commands supported by the server/service
 

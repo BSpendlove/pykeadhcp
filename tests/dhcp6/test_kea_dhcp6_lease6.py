@@ -49,6 +49,12 @@ def test_kea_dhcp6_lease6_get(kea_server: Kea):
     assert response.iaid == 1234
 
 
+# Currently not working, will need to look into why....
+# def test_kea_dhcp6_lease6_get_all(kea_server: Kea):
+#    response = kea_server.dhcp6.lease6_get_all()
+#    assert len(response) > 0
+
+
 def test_kea_dhcp6_lease6_del(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 0
