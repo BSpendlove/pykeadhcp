@@ -332,8 +332,30 @@ class Dhcp6:
     def subnet6_delta_del(self) -> None:
         raise NotImplementedError
 
-    def subnet6_get(self) -> None:
-        raise NotImplementedError
+    def subnet6_get(self, subnet_id: int) -> Subnet6:
+        """Gets detailed information about the specified subnet
+
+        Args:
+            subnet_id:      ID of the subnet
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#subnet6-get
+        """
+        data = self.api.send_command_with_arguments(
+            command="subnet6-get",
+            service=self.service,
+            arguments={"id": subnet_id},
+            required_hook="subnet_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(subnet_id)
+
+        if not data.arguments["subnet4"]:
+            return None
+
+        subnet = data.arguments["subnet4"][0]
+        return Subnet6.parse_obj(subnet)
 
     def subnet6_list(self) -> None:
         raise NotImplementedError

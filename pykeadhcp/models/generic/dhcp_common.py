@@ -1,5 +1,4 @@
 from typing import Optional, List, Union
-from pydantic import conint
 from pykeadhcp.models.generic.base import KeaBaseModel
 from pykeadhcp.models.generic.option_data import OptionData
 from pykeadhcp.models.enums import ReservationMode, DDNSReplaceClientNameEnum

@@ -28,6 +28,42 @@ subnets_v4 = server.dhcp4.subnet4_list()
 
 for subnet in subnets_v4:
     print(subnet.subnet, subnet.option_data, subnet.relay, subnet.pools_list)
+
+my_subnet = server.dhcp6.subnet4_get(name="pykeadhcp-pytest")
+print(my_subnet.json(exclude_none=True, indent=4))
+
+# {
+#     "valid_lifetime": 4000,
+#     "renew_timer": 1000,
+#     "rebind_timer": 2000,
+#     "option_data": [],
+#     "calculate_tee_times": true,
+#     "t1_percent": 0.5,
+#     "t2_percent": 0.8,
+#     "store_extended_info": false,
+#     "name": "pykeadhcp-pytest",
+#     "relay": {
+#         "ip-addresses": []
+#     },
+#     "subnet6": [
+#         {
+#             "valid_lifetime": 4000,
+#             "renew_timer": 1000,
+#             "rebind_timer": 2000,
+#             "option_data": [],
+#             "calculate_tee_times": true,
+#             "t1_percent": 0.5,
+#             "t2_percent": 0.8,
+#             "store_extended_info": false,
+#             "id": 40123,
+#             "subnet": "2001:db8::/64",
+#             "preferred_lifetime": 3600,
+#             "pd_pools": [],
+#             "rapid_commit": false
+#         }
+#     ],
+#     "rapid_commit": false
+# }
 ```
 
 4. Utilize the Pydantic models which provide basic data validation
