@@ -70,6 +70,11 @@ def test_kea_dhcp6_lease6_get_by_duid(kea_server: Kea):
     assert response.iaid == 1234
 
 
+def test_kea_dhcp6_lease6_get_by_hostname_non_existent(kea_server: Kea):
+    with pytest.raises(KeaLeaseNotFoundException):
+        kea_server.dhcp6.lease6_get_by_hostname(hostname="bad-hostname")
+
+
 def test_kea_dhcp6_lease6_del(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 0

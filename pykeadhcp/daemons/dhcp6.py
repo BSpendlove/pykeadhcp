@@ -235,6 +235,30 @@ class Dhcp6:
         lease = data.arguments["leases"][0]
         return Lease6.parse_obj(lease)
 
+    def lease6_get_by_hostname(self, hostname: str) -> Lease6:
+        """Retrieves all IPv6 leases for the specified hostname
+
+        Args:
+            hostname:   Hostname
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-get-by-hostname
+        """
+        data = self.api.send_command_with_arguments(
+            command="lease6-get-by-hostname",
+            service=self.service,
+            arguments={"hostname": hostname},
+            required_hook="lease_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaLeaseNotFoundException(
+                f"Unable to find lease using hostname '{hostname}'"
+            )
+
+        lease = data.arguments["leases"][0]
+        return Lease6.parse_obj(lease)
+
     def lease6_get_page(self, limit: int, search_from: str) -> Lease6Page:
         """Retrieves all IPv6 leases by page
 
