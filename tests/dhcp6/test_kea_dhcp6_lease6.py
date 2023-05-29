@@ -59,6 +59,17 @@ def test_kea_dhcp6_lease6_get_page(kea_server: Kea):
     assert response.count > 0
 
 
+def test_kea_dhcp6_lease6_get_by_duid(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_get_by_duid(
+        duid="1a:1b:1c:1d:1e:1f:20:21:22:23:24"
+    )
+    assert response
+    assert response.type == "IA_NA"
+    assert response.ip_address == "2001:db8::32"
+    assert response.duid == "1a:1b:1c:1d:1e:1f:20:21:22:23:24"
+    assert response.iaid == 1234
+
+
 def test_kea_dhcp6_lease6_del(kea_server: Kea):
     response = kea_server.dhcp6.lease6_del(ip_address="2001:db8::32")
     assert response.result == 0

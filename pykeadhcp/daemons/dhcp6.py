@@ -190,7 +190,7 @@ class Dhcp6:
         return Lease6.parse_obj(data.arguments)
 
     def lease6_get_all(self, subnets: List[int] = []) -> List[Lease6]:
-        """Retrieves all IPv4 leases or all leases for the specified subnets
+        """Retrieves all IPv6 leases or all leases for the specified subnets
 
         Args:
             subnets:        List of subnet IDs to fetch leases for
@@ -211,11 +211,35 @@ class Dhcp6:
         leases = [Lease6.parse_obj(lease) for lease in data.arguments["leases"]]
         return leases
 
-    def lease6_get_page(self, limit: int, search_from: str) -> Lease6Page:
-        """Retrieves all IPv4 leases by page
+    def lease6_get_by_duid(self, duid: str) -> Lease6:
+        """Retrieves a lease for the specified duid
 
         Args:
-            limit:          Set the limit of IPv4 leases to be returned
+            duid:       DHCP Unique Identifier
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease6-get-by-duid
+        """
+        data = self.api.send_command_with_arguments(
+            command="lease6-get-by-duid",
+            service=self.service,
+            arguments={"duid": duid},
+            required_hook="lease_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaLeaseNotFoundException(
+                f"Unable to find a lease using duid '{duid}'"
+            )
+
+        lease = data.arguments["leases"][0]
+        return Lease6.parse_obj(lease)
+
+    def lease6_get_page(self, limit: int, search_from: str) -> Lease6Page:
+        """Retrieves all IPv6 leases by page
+
+        Args:
+            limit:          Set the limit of IPv6 leases to be returned
             search_from:    Start from either a specific IP address or 'start' for the first
 
         Kea API Reference:
