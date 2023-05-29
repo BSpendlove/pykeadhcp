@@ -55,3 +55,8 @@ def test_kea_dhcp6_subnet6_update(kea_server: Kea):
     updated_subnet = kea_server.dhcp6.subnet6_get(subnet_id=40123)
     assert updated_subnet
     assert updated_subnet.subnet == "2001:db8::/96"
+
+
+def test_kea_dhcp6_subnet6_del(kea_server: Kea):
+    response = kea_server.dhcp6.subnet6_del(subnet_id=40123)
+    assert response.result == 0
