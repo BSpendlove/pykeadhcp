@@ -18,7 +18,7 @@ del
 
 def test_kea_dhcp4_subnet4_get_non_existent(kea_server: Kea):
     with pytest.raises(KeaSubnetNotFoundException):
-        response = kea_server.dhcp4.subnet4_get(subnet_id=40123)
+        kea_server.dhcp4.subnet4_get(subnet_id=40123)
 
 
 def test_kea_dhcp4_subnet4_add(kea_server: Kea):
@@ -98,4 +98,4 @@ def test_kea_dhcp4_subnet4_del(kea_server: Kea):
 
 def test_kea_dhcp4_subnet4_del_non_existent(kea_server: Kea):
     with pytest.raises(KeaSubnetNotFoundException):
-        response = kea_server.dhcp4.subnet4_del(subnet_id=40123)
+        kea_server.dhcp4.subnet4_del(subnet_id=40123)
