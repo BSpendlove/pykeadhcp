@@ -82,6 +82,10 @@ print(create_subnet.result, create_subnet.text)
 # pykeadhcp.exceptions.KeaHookLibraryNotConfiguredException: Hook library 'subnet_cmds' is not configured for 'dhcp4' service. Please ensure this is enabled in the configuration for the 'dhcp4' daemon
 ```
 
+The super handy feature with using Pydantic for all the data models is the fact it uses Python type annotation which most editors/IDEs should be able to provide autocomplete functionality like this:
+
+![VSCode autocomplete intellisense example](docs/media/vscode_autocomplete.png)
+
 ### Basic Authentication
 
 If you have basic authentication enabled on your Kea Servers, initialize the `Kea` class like this:
