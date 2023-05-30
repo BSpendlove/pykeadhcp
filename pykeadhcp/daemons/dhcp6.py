@@ -39,7 +39,7 @@ class Dhcp6:
         eg. subnet6-add, commands like lease6-add won't need a config refresh to keep the cached config up to date
         """
         config = self.config_get()
-        self.cache_config = config.arguments
+        self.cached_config = config.arguments
 
     def build_report(self) -> KeaResponse:
         """Returns list of compilation options that this particular binary was built with
