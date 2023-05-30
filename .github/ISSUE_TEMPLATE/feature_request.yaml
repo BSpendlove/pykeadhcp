@@ -1,0 +1,32 @@
+---
+name: Feature Request
+description: Suggest a new feature or enhancement for pykeadhcp
+labels: ["type: feature"]
+body:
+  - type: dropdown
+    attributes:
+      label: Daemon/Area
+      options:
+        - ctrlagent
+        - dhcp4
+        - dhcp6
+        - ddns
+        - Pydantic Models
+        - All Daemons
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Feature/Enhancement you are proposing
+      description: >
+        Describe in detail what feature or enhancement you would like to add to
+        pykeadhcp.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reason for Feature/Enhancement
+      description: >
+        Describe the purpose of this change and what it solves for you or the community.
+    validations:
+      required: true
