@@ -345,7 +345,8 @@ class Dhcp6:
             service=self.service,
             arguments={
                 "shared-networks": [
-                    network.dict(exclude_none=True) for network in shared_networks
+                    network.dict(exclude_none=True, by_alias=True)
+                    for network in shared_networks
                 ]
             },
             required_hook="subnet_cmds",
@@ -499,7 +500,9 @@ class Dhcp6:
             command="subnet6-add",
             service=self.service,
             arguments={
-                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+                "subnet6": [
+                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                ]
             },
             required_hook="subnet_cmds",
         )
@@ -538,7 +541,9 @@ class Dhcp6:
             command="subnet6-delta-add",
             service=self.service,
             arguments={
-                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+                "subnet6": [
+                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                ]
             },
             required_hook="subnet_cmds",
         )
@@ -556,7 +561,9 @@ class Dhcp6:
             command="subnet6-delta-del",
             service=self.service,
             arguments={
-                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+                "subnet6": [
+                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                ]
             },
             required_hook="subnet_cmds",
         )
@@ -614,7 +621,9 @@ class Dhcp6:
             command="subnet6-update",
             service=self.service,
             arguments={
-                "subnet6": [subnet.dict(exclude_none=True) for subnet in subnets]
+                "subnet6": [
+                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                ]
             },
             required_hook="subnet_cmds",
         )
