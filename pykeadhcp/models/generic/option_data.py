@@ -3,6 +3,7 @@ from pykeadhcp.models.generic.base import KeaBaseModel
 
 
 class OptionData(KeaBaseModel):
+    data: str
     name: Optional[str]
     code: Optional[int]
     space: Optional[str]
