@@ -1,8 +1,8 @@
 from typing import Optional
-from pydantic import BaseModel
+from pykeadhcp.models.generic.base import KeaBaseModel
 
 
-class Hook(BaseModel):
+class Hook(KeaBaseModel):
     library: str
     parameters: Optional[dict]
     name: Optional[str]

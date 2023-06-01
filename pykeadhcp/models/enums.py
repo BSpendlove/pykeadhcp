@@ -24,3 +24,21 @@ class DDNSReplaceClientNameEnum(str, Enum):
 class Lease6TypeEnum(str, Enum):
     iana = "IA_NA"
     iapd = "IA_PD"
+
+
+class LoggerLevelEnum(str, Enum):
+    critical = "CRITICAL"
+    error = "ERROR"
+    warning = "WARNING"
+    info = "WARNING"
+    debug = "DEBUG"
+
+
+class DHCPSocketTypeEnum(str, Enum):
+    raw = "raw"
+    udp = "udp"
+
+
+class OutboundInterfaceEnum(str, Enum):
+    same_as_inbound = "same-as-inbound"
+    use_routing = "use-routing"
