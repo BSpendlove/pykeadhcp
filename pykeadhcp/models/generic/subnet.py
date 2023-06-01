@@ -6,7 +6,7 @@ from pykeadhcp.models.generic.pool import Pool
 
 class Subnet(CommonDHCPParams):
     id: Optional[conint(gt=0, lt=4294967295)]
-    pools_list: Optional[List[Pool]]
+    pools: Optional[List[Pool]]
     subnet: str
     hostname_char_set: Optional[str]
     hostname_char_replacement: Optional[str]

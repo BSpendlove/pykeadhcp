@@ -4,7 +4,7 @@ from pykeadhcp.models.generic.option_data import OptionData
 
 
 class Pool(KeaBaseModel):
-    pool_entry: str
+    pool: str
     option_data: Optional[List[OptionData]]
     client_class: Optional[str]
     require_client_classes: Optional[str]
