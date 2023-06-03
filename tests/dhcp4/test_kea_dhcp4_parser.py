@@ -19,7 +19,11 @@ def test_kea_dhcp4_parser_parse_config(kea_server: Kea):
 def test_kea_dhcp4_parser_config_test(kea_server: Kea):
     cached_config = kea_server.dhcp4.cached_config
     parsed = Dhcp4Parser(config=cached_config)
-    config_to_test = {"Dhcp4": parsed.config.dict(exclude_none=True, by_alias=True)}
+    config_to_test = {
+        "Dhcp4": parsed.config.dict(
+            exclude_none=True, exclude_unset=True, by_alias=True
+        )
+    }
 
     test_results = kea_server.dhcp4.config_test(config=config_to_test)
     assert test_results.result == 0
