@@ -39,6 +39,13 @@ class Dhcp4:
         config = self.config_get()
         self.cached_config = config.arguments
 
+    def get_next_available_subnet_id(self) -> int:
+        """Returns the next available subnet-id for use with Dhcp4 subnets"""
+        subnets = self.subnet4_list()
+        subnet_ids = [subnet.id for subnet in subnets]
+        next_id = self.api.get_next_available_subnet_id(subnet_ids=subnet_ids)
+        return next_id
+
     def build_report(self) -> KeaResponse:
         """Returns list of compilation options that this particular binary was built with
 
