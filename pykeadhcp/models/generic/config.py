@@ -7,6 +7,7 @@ from pykeadhcp.models.enums import ReservationMode, DDNSReplaceClientNameEnum
 
 
 class CommonConfig(KeaBaseModel):
+    store_extended_info: Optional[bool]
     user_context: Optional[dict]
     comment: Optional[str]
     unknown_map_entry: Optional[str]

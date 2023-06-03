@@ -9,14 +9,17 @@ class Output(KeaBaseModel):
     flush: bool
     maxsize: int
     maxver: int
-    pattern: str
+    pattern: Optional[str]
 
 
 class Logger(KeaBaseModel):
     name: str
-    output_options: List[Output]
-    debuglevel: conint(ge=1, le=100)
+    output_options: Optional[List[Output]]
+    debuglevel: conint(ge=0, le=100)
     severity: Optional[LoggerLevelEnum]
     user_context: Optional[dict]
     comment: Optional[str]
     unknown_map_entry: Optional[str]
+
+    class Config:
+        fields = {"output_options": "output_options"}
