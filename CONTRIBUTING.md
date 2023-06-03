@@ -28,10 +28,8 @@ You must adhere to the following formats for tests:
    build.
 2. Update any documentation with details of changes (readme, commands, etc...), this includes new environment 
    variables, exposed ports, useful file locations and container parameters.
-3. Perform tests as required using pytest `pytest -s tests`. If you are only implementing API changes for dhcp4 and the control agent but not dhcp6, you can skip these tests using `pytest -s tests -k "dhcp4"`. Ensure that you provide the output of the tests in the pull request as this will be compared when another developer runs the test to validate the new test work along with the old tests.
-4. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/). Ideally
-   you can use `bump` module to do this.
+3. Use poetry release command `poetry version prerelease` so that the dev CI/CD pipeline is able to upload to the test py-pi repository. You should then run the tests in the next step against this prerelease module that was uploaded to test pypi.
+4. Perform tests as required using pytest `pytest -s tests`. If you are only implementing API changes for dhcp4 and the control agent but not dhcp6, you can skip these tests using `pytest -s tests -k "dhcp4"`. Ensure that you provide the output of the tests in the pull request as this will be compared when another developer runs the test to validate the new test work along with the old tests.
 5. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
