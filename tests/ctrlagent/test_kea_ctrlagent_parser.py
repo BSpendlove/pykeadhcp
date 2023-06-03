@@ -20,7 +20,9 @@ def test_kea_ctrlagent_parser_config_test(kea_server: Kea):
     cached_config = kea_server.ctrlagent.cached_config
     parsed = CtrlAgentParser(config=cached_config)
     config_to_test = {
-        "Control-agent": parsed.config.dict(exclude_none=True, by_alias=True)
+        "Control-agent": parsed.config.dict(
+            exclude_none=True, exclude_unset=True, by_alias=True
+        )
     }
 
     test_results = kea_server.ctrlagent.config_test(config=config_to_test)
