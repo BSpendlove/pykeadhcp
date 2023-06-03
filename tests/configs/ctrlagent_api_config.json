@@ -1,0 +1,28 @@
+{
+    "Control-agent": {
+        "control-sockets": {
+            "d2": {
+                "socket-name": "/tmp/kea-ddns-ctrl-socket",
+                "socket-type": "unix"
+            },
+            "dhcp4": {
+                "socket-name": "/tmp/kea4-ctrl-socket",
+                "socket-type": "unix"
+            },
+            "dhcp6": {
+                "socket-name": "/tmp/kea6-ctrl-socket",
+                "socket-type": "unix"
+            }
+        },
+        "hooks-libraries": [],
+        "http-host": "0.0.0.0",
+        "http-port": 8080,
+        "loggers": [
+            {
+                "debuglevel": 0,
+                "name": "kea-ctrl-agent",
+                "severity": "INFO"
+            }
+        ]
+    }
+}
