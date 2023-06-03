@@ -33,11 +33,11 @@ ip_reservations_unique
 reservations_lookup_first
 compatibility
 parked_packet_limit
+decline_probation_period
 
 ## Dhcp4 Specific Global Params
 shared_networks
 reservations
-decline_probation_period
 subnet4_list
 echo_client_id
 match_client_id
@@ -53,7 +53,6 @@ data_directory
 preferred_lifetime
 min_preferred_lifetime
 max_preferred_lifetime
-decline_probation_period
 subnet6_list
 mac_sources
 relay_supplied_options
