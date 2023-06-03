@@ -181,7 +181,7 @@ class Dhcp4:
         return self.api.send_command_with_arguments(
             command="lease4-add",
             service=self.service,
-            arguments=lease.dict(exclude_none=True, by_alias=True),
+            arguments=lease.dict(exclude_none=True, exclude_unset=True, by_alias=True),
             required_hook="lease_cmds",
         )
 
@@ -362,7 +362,7 @@ class Dhcp4:
         return self.api.send_command_with_arguments(
             command="lease4-update",
             service=self.service,
-            arguments=lease.dict(exclude_none=True, by_alias=True),
+            arguments=lease.dict(exclude_none=True, exclude_unset=True, by_alias=True),
             required_hook="lease_cmds",
         )
 
@@ -429,7 +429,7 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "shared-networks": [
-                    network.dict(exclude_none=True, by_alias=True)
+                    network.dict(exclude_none=True, exclude_unset=True, by_alias=True)
                     for network in shared_networks
                 ]
             },
@@ -636,7 +636,8 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "subnet4": [
-                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                    subnet.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for subnet in subnets
                 ]
             },
             required_hook="subnet_cmds",
@@ -677,7 +678,8 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "subnet4": [
-                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                    subnet.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for subnet in subnets
                 ]
             },
             required_hook="subnet_cmds",
@@ -697,7 +699,8 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "subnet4": [
-                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                    subnet.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for subnet in subnets
                 ]
             },
             required_hook="subnet_cmds",
@@ -757,7 +760,8 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "subnet4": [
-                    subnet.dict(exclude_none=True, by_alias=True) for subnet in subnets
+                    subnet.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for subnet in subnets
                 ]
             },
             required_hook="subnet_cmds",
