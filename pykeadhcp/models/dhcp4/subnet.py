@@ -12,3 +12,10 @@ class Subnet4(Subnet):
     subnet_4o6_interface_id: Optional[str]
     subnet_4o6_subnet: Optional[str]
     reservations: Optional[List[Reservation4]]
+
+    class Config:
+        fields = {
+            "subnet_4o6_interface": "4o6-interface",
+            "subnet_4o6_interface_id": "4o6-interface-id",
+            "subnet_4o6_subnet": "4o6-subnet",
+        }
