@@ -19,6 +19,7 @@ jobs:
           options: "--check --verbose"
       - name: Run Tests
         run: |
+          pip install -r requirements.txt .
           pip install pytest
           pytest -s tests/ci
       - name: Run image
