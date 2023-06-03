@@ -19,7 +19,7 @@ class CommonDhcpConfig(CommonConfig):
     max_valid_lifetime: Optional[int]
     renew_timer: Optional[int]
     rebind_timer: Optional[int]
-    option_data: Optional[List[OptionData]]
+    option_data: Optional[List[OptionData]] = []
     reservation_mode: Optional[ReservationMode]
     reservations_global: Optional[bool]
     reservations_in_subnet: Optional[bool]

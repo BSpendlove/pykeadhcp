@@ -14,4 +14,4 @@ class Authentication(CommonConfig):
     type: AuthenticationTypeEnum
     realm: str
     directory: Optional[str]
-    clients: List[Optional[AuthenticationClient]]
+    clients: List[Optional[AuthenticationClient]] = []

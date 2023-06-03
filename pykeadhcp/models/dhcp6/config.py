@@ -8,14 +8,14 @@ from pykeadhcp.models.dhcp6.server_id import ServerId
 
 
 class Dhcp6DaemonConfig(CommonDhcpDaemonConfig):
-    client_classes: Optional[List[ClientClass6]]
-    shared_networks: Optional[List[SharedNetwork6]]
-    reservations: Optional[List[Reservation6]]
+    client_classes: Optional[List[ClientClass6]] = []
+    shared_networks: Optional[List[SharedNetwork6]] = []
+    reservations: Optional[List[Reservation6]] = []
     data_directory: Optional[str]
     preferred_lifetime: Optional[int]
     min_preferred_lifetime: Optional[int]
     max_preferred_lifetime: Optional[int]
-    subnet6: Optional[List[Subnet6]]
-    mac_sources: Optional[List[str]]
-    relay_supplied_options: Optional[List[str]]
+    subnet6: Optional[List[Subnet6]] = []
+    mac_sources: Optional[List[str]] = []
+    relay_supplied_options: Optional[List[str]] = []
     server_id: ServerId

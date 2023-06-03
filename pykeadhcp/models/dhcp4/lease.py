@@ -8,4 +8,4 @@ class Lease4(Lease):
 
 class Lease4Page(LeasePage):
     count: int
-    leases: Optional[List[Lease4]]
+    leases: Optional[List[Lease4]] = []

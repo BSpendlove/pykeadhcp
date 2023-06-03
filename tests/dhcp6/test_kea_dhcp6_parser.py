@@ -19,7 +19,11 @@ def test_kea_dhcp6_parser_parse_config(kea_server: Kea):
 def test_kea_dhcp6_parser_config_test(kea_server: Kea):
     cached_config = kea_server.dhcp6.cached_config
     parsed = Dhcp6Parser(config=cached_config)
-    config_to_test = {"Dhcp6": parsed.config.dict(exclude_none=True, by_alias=True)}
+    config_to_test = {
+        "Dhcp6": parsed.config.dict(
+            exclude_none=True, exclude_unset=True, by_alias=True
+        )
+    }
 
     test_results = kea_server.dhcp6.config_test(config=config_to_test)
     assert test_results.result == 0

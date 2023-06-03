@@ -17,6 +17,11 @@ jobs:
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
+      - name: Run Tests
+        run: |
+          pip install -r requirements.txt .
+          pip install pytest
+          pytest -s tests/ci
       - name: Run image
         uses: abatilo/actions-poetry@v2
         with:

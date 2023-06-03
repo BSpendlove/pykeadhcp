@@ -18,12 +18,12 @@ from pykeadhcp.models.enums import (
 
 
 class CommonDaemonConfig(CommonDhcpConfig):
-    hooks_libraries: Optional[List[Hook]]
-    loggers: Optional[List[Logger]]
+    hooks_libraries: Optional[List[Hook]] = []
+    loggers: Optional[List[Logger]] = []
 
 
 class InterfaceListConfig(KeaBaseModel):
-    interfaces: List[str]
+    interfaces: List[str] = []
     dhcp_socket_type: Optional[DHCPSocketTypeEnum]
     outbound_interface: Optional[OutboundInterfaceEnum]
     re_detect: Optional[bool]
@@ -37,8 +37,8 @@ class CommonDhcpDaemonConfig(CommonDaemonConfig):
     lease_database: Optional[Database]
     hosts_database: Optional[Database]
     hosts_databases: Optional[List[Database]]
-    host_reservation_identifiers: Optional[List[HostReservationIdentifierEnum]]
-    option_def: Optional[List[OptionDef]]
+    host_reservation_identifiers: Optional[List[HostReservationIdentifierEnum]] = []
+    option_def: Optional[List[OptionDef]] = []
     expired_leases_processing: Optional[dict]
     dhcp4o6_port: Optional[int]
     control_socket: Optional[ControlSocket]

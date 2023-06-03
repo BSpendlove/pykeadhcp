@@ -6,7 +6,7 @@ from pykeadhcp.models.dhcp4.subnet import Subnet4
 
 
 class SharedNetwork4(SharedNetwork):
-    subnet4: Optional[List[Subnet4]]
+    subnet4: Optional[List[Subnet4]] = []
     match_client_id: Optional[bool]
     authoritative: Optional[bool]
     next_server: Optional[str]
