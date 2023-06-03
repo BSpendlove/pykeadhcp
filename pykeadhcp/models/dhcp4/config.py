@@ -7,10 +7,10 @@ from pykeadhcp.models.dhcp4.reservation import Reservation4
 
 
 class Dhcp4DaemonConfig(CommonDhcpDaemonConfig):
-    client_classes: Optional[List[ClientClass4]]
-    shared_networks: Optional[List[SharedNetwork4]]
-    reservations: Optional[List[Reservation4]]
-    subnet4: Optional[List[Subnet4]]
+    client_classes: Optional[List[ClientClass4]] = []
+    shared_networks: Optional[List[SharedNetwork4]] = []
+    reservations: Optional[List[Reservation4]] = []
+    subnet4: Optional[List[Subnet4]] = []
     echo_client_id: Optional[bool]
     match_client_id: Optional[bool]
     authoritative: Optional[bool]

@@ -9,7 +9,7 @@ class StatusGet(BaseModel):
     reload: int
     multi_threading_enabled: Optional[bool]
     sockets: Optional[Sockets]
-    high_availability: Optional[List[dict]]
+    high_availability: Optional[List[dict]] = []
 
     class Config:
         fields = {

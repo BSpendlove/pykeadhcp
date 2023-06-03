@@ -8,5 +8,5 @@ class CommonDHCPParams(CommonDhcpConfig):
 
     interface: Optional[str]
     client_class: Optional[str]
-    require_client_classes: Optional[List[str]]
+    require_client_classes: Optional[List[str]] = []
     relay: Optional[Relay]

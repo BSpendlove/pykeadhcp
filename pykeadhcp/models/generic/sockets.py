@@ -4,7 +4,7 @@ from pykeadhcp.models.enums import StatusEnum
 
 
 class Sockets(BaseModel):
-    errors: Optional[List[str]]
+    errors: Optional[List[str]] = []
     status: StatusEnum
 
     class Config:

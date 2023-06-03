@@ -14,7 +14,7 @@ class Output(KeaBaseModel):
 
 class Logger(KeaBaseModel):
     name: str
-    output_options: Optional[List[Output]]
+    output_options: Optional[List[Output]] = []
     debuglevel: conint(ge=0, le=100)
     severity: Optional[LoggerLevelEnum]
     user_context: Optional[dict]
