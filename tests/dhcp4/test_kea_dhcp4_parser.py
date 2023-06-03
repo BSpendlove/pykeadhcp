@@ -26,6 +26,4 @@ def test_kea_dhcp4_parser_config_test(kea_server: Kea):
 
     cached_config_json = json.dumps(cached_config, indent=4)
     parsed_config_json = json.dumps(config_to_test, indent=4, sort_keys=True)
-
-    print(parsed_config_json)
     assert cached_config_json == parsed_config_json
