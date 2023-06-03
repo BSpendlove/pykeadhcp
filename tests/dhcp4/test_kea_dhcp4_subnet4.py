@@ -1,5 +1,6 @@
 from pykeadhcp import Kea
 from pykeadhcp.models.dhcp4.subnet import Subnet4
+from pykeadhcp.models.generic.option_data import OptionData
 from pykeadhcp.exceptions import KeaSubnetNotFoundException
 import pytest
 
@@ -22,7 +23,8 @@ def test_kea_dhcp4_subnet4_get_non_existent(kea_server: Kea):
 
 
 def test_kea_dhcp4_subnet4_add(kea_server: Kea):
-    data = Subnet4(id=40123, subnet="192.0.2.32/31")
+    option_data = OptionData(data="192.0.2.32", code=3)
+    data = Subnet4(id=40123, subnet="192.0.2.32/31", option_data=[option_data])
     subnets = [data]
     response = kea_server.dhcp4.subnet4_add(subnets=subnets)
     assert response.result == 0
@@ -99,3 +101,12 @@ def test_kea_dhcp4_subnet4_del(kea_server: Kea):
 def test_kea_dhcp4_subnet4_del_non_existent(kea_server: Kea):
     with pytest.raises(KeaSubnetNotFoundException):
         kea_server.dhcp4.subnet4_del(subnet_id=40123)
+
+
+def test_kea_dhcp4_subnet4_get_next_available_id(kea_server: Kea):
+    next_available_id = kea_server.dhcp4.get_next_available_subnet_id()
+    subnets = kea_server.dhcp4.subnet4_list()
+
+    assert subnets
+    subnet_ids = [subnet.id for subnet in subnets]
+    assert next_available_id not in subnets
