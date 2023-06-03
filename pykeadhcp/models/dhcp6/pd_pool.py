@@ -4,9 +4,9 @@ from pykeadhcp.models.generic.option_data import OptionData
 
 
 class PDPool(KeaBaseModel):
-    pd_prefix: str
-    pd_prefix_len: int
-    pd_delegated_len: int
+    prefix: str
+    prefix_len: int
+    delegated_len: int
     option_data: Optional[List[OptionData]]
     client_class: Optional[str]
     require_client_classes: Optional[List[str]]
