@@ -127,9 +127,47 @@ server.dhcp4.refresh_cached_config()
 
 For API calls that don't amend the configuration (eg. lease4-add, lease6-add, config-get, etc....), there is no need to refresh the relevant daemon configuration. Maybe I will add a feature in the future to allow the user to specify if they want the cached_config to be automatically refreshed when a function is called that requires a refresh but for now its manual.
 
+## Parsers
+
+Majority of the useful API functionality requires a subscription for the premium hooks to use API commands like `subnet4-add` or `network6-add` as an example. This is typically the recommended way to interact with Kea as there is some additional validation that the API will perform and potentially prevent misconfiguration of your daemons (Dhcp4, Dhcp6, Control Agent, DDNS) that pykeadhcp may not correctly implement.
+
+However with the use of `config-test` and `config-set` API commands which are supported for all daemons in the free version of ISC Kea DHCP, you can utilize the various parsers implemented in pykeadhcp which provides similar functionality to create, read, update and delete various resources like subnets, shared networks, reservations etc... The parsers attempt to parse a local configuration (eg. server.dhcp4.cached_config) and should be used with the 2 API commands `config-test` and `config-set`. The problem with `config-set` is that it will restart the daemon on the server unlike the specific commands to directly interact with the configuration.
+
+Before continuing, these parsers are manually crafted and can break at anytime when ISC release an update that changes the behaviour of the configuration model. Therefore you should use parsers at your own risk.
+
+### Example of Dhcp4Parser to retrieve a specific subnet by a CIDR
+
+```python
+from pykeadhcp import Kea
+from pykeadhcp.parsers.dhcp4 import Dhcp4Parser
+
+cidr_to_find = "192.168.1.0/24"
+
+server = Kea(host="http://localhost", port=8000)
+parser = Dhcp4Parser(config=server.dhcp4.cached_config)
+subnet = parser.get_subnet_by_cidr(cidr=cidr_to_find)
+
+if not subnet:
+    exit(f"Unable to find subnet: {cidr_to_find}")
+
+print(f"Found Subnet {cidr_to_find} (Subnet ID: {subnet.id})")
+
+option_data = subnet.option_data
+for option in option_data:
+    print(f"Code: {option.code}")
+    print(f"Data: {option.data}")
+
+# Output
+# Found Subnet 192.168.1.0/24 (Subnet ID: 1)
+# Code: 3
+# Data: 192.168.1.1
+# Code: 6
+# Data: 1.1.1.1,9.9.9.9
+```
+
 ## API Reference
 
-All supported commands by the daemons are in the format of the API referenced commands with the exception of replacing any hypthen or space with an underscore. Eg. the `build-report` API command for all daemons is implemented as `build_report` so it heavily ties into the Kea predefined commands when looking at their documentation. Currently everything is built towards Kea 2.2.0. Pydantic variables will replace any hyphens with an underscore however when loading/exporting the data models, it will replace all keys with the hyphen to adhere to the Kea expected variables, ensure that the `KeaBaseModel` (located in `from pykeadhcp.models.generic.base import KeaBaseModel` instead of `from pydantic import BaseModel`) is used when creating any Pydantic models to inherit this functionality.
+All supported commands by the daemons are in the format of the API referenced commands with the exception of replacing any hyphen or space with an underscore. Eg. the `build-report` API command for all daemons is implemented as `build_report` so it heavily ties into the Kea predefined commands when looking at their documentation. Currently everything is built towards Kea 2.2.0. Pydantic variables will replace any hyphens with an underscore however when loading/exporting the data models, it will replace all keys with the hyphen to adhere to the Kea expected variables, ensure that the `KeaBaseModel` (located in `from pykeadhcp.models.generic.base import KeaBaseModel` instead of `from pydantic import BaseModel`) is used when creating any Pydantic models to inherit this functionality.
 
 ## Development / Contribution
 

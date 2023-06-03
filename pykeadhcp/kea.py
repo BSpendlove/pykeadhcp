@@ -200,3 +200,16 @@ class Kea:
             },
         )
         return command_results
+
+    def get_next_available_subnet_id(self, subnet_ids: List[int]) -> int:
+        """Returns the next available subnet-id based on a given list of
+        existing subnet-ids
+
+        Args:
+            subnet_ids:     Existing list of subnet-ids gathered via
+                subnet4_list/subnet6_list or manually gathered via parser
+        """
+        next_id = next(
+            i for i, e in enumerate(sorted(subnet_ids) + [None], 1) if i != e
+        )
+        return next_id

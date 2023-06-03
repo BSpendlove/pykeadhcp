@@ -1,0 +1,180 @@
+{
+    "Dhcp4": {
+        "authoritative": false,
+        "boot-file-name": "",
+        "calculate-tee-times": false,
+        "control-socket": {
+            "socket-name": "/tmp/kea4-ctrl-socket",
+            "socket-type": "unix"
+        },
+        "ddns-generated-prefix": "myhost",
+        "ddns-override-client-update": false,
+        "ddns-override-no-update": false,
+        "ddns-qualifying-suffix": "",
+        "ddns-replace-client-name": "never",
+        "ddns-send-updates": true,
+        "ddns-update-on-renew": false,
+        "ddns-use-conflict-resolution": true,
+        "decline-probation-period": 86400,
+        "dhcp-ddns": {
+            "enable-updates": false,
+            "max-queue-size": 1024,
+            "ncr-format": "JSON",
+            "ncr-protocol": "UDP",
+            "sender-ip": "0.0.0.0",
+            "sender-port": 0,
+            "server-ip": "127.0.0.1",
+            "server-port": 53001
+        },
+        "dhcp-queue-control": {
+            "capacity": 64,
+            "enable-queue": false,
+            "queue-type": "kea-ring4"
+        },
+        "dhcp4o6-port": 0,
+        "early-global-reservations-lookup": false,
+        "echo-client-id": true,
+        "expired-leases-processing": {
+            "flush-reclaimed-timer-wait-time": 25,
+            "hold-reclaimed-time": 172800,
+            "max-reclaim-leases": 0,
+            "max-reclaim-time": 0,
+            "reclaim-timer-wait-time": 3600,
+            "unwarned-reclaim-cycles": 5
+        },
+        "hooks-libraries": [
+            {
+                "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_lease_cmds.so"
+            }
+        ],
+        "host-reservation-identifiers": [
+            "hw-address",
+            "duid",
+            "circuit-id",
+            "client-id"
+        ],
+        "hostname-char-replacement": "",
+        "hostname-char-set": "[^A-Za-z0-9.-]",
+        "interfaces-config": {
+            "interfaces": [
+                "eth0"
+            ],
+            "re-detect": true
+        },
+        "ip-reservations-unique": true,
+        "lease-database": {
+            "type": "memfile"
+        },
+        "loggers": [
+            {
+                "debuglevel": 0,
+                "name": "kea-dhcp4",
+                "output-options": [
+                    {
+                        "flush": true,
+                        "maxsize": 2048000,
+                        "maxver": 4,
+                        "output": "/var/log/kea-dhcp4.log",
+                        "pattern": ""
+                    }
+                ],
+                "severity": "INFO"
+            }
+        ],
+        "match-client-id": true,
+        "multi-threading": {
+            "enable-multi-threading": false,
+            "packet-queue-size": 64,
+            "thread-pool-size": 0
+        },
+        "next-server": "0.0.0.0",
+        "option-data": [],
+        "option-def": [],
+        "parked-packet-limit": 256,
+        "rebind-timer": 32400,
+        "renew-timer": 21600,
+        "reservations-global": false,
+        "reservations-in-subnet": true,
+        "reservations-lookup-first": false,
+        "reservations-out-of-pool": false,
+        "sanity-checks": {
+            "lease-checks": "warn"
+        },
+        "server-hostname": "",
+        "server-tag": "",
+        "shared-networks": [],
+        "statistic-default-sample-age": 0,
+        "statistic-default-sample-count": 20,
+        "store-extended-info": false,
+        "subnet4": [
+            {
+                "4o6-interface": "",
+                "4o6-interface-id": "",
+                "4o6-subnet": "",
+                "calculate-tee-times": false,
+                "id": 1,
+                "max-valid-lifetime": 43200,
+                "min-valid-lifetime": 43200,
+                "option-data": [
+                    {
+                        "always-send": false,
+                        "code": 3,
+                        "csv-format": true,
+                        "data": "192.168.1.1",
+                        "name": "routers",
+                        "space": "dhcp4"
+                    },
+                    {
+                        "always-send": false,
+                        "code": 6,
+                        "csv-format": true,
+                        "data": "1.1.1.1,9.9.9.9",
+                        "name": "domain-name-servers",
+                        "space": "dhcp4"
+                    }
+                ],
+                "pools": [
+                    {
+                        "option-data": [],
+                        "pool": "192.168.1.100-192.168.1.199"
+                    }
+                ],
+                "rebind-timer": 32400,
+                "relay": {
+                    "ip-addresses": []
+                },
+                "renew-timer": 21600,
+                "reservations": [
+                    {
+                        "boot-file-name": "",
+                        "client-classes": [],
+                        "client-id": "01112233445566",
+                        "hostname": "",
+                        "ip-address": "192.168.1.11",
+                        "next-server": "0.0.0.0",
+                        "option-data": [],
+                        "server-hostname": ""
+                    },
+                    {
+                        "boot-file-name": "",
+                        "client-classes": [],
+                        "hostname": "",
+                        "hw-address": "1a:1b:1c:1d:1e:1f",
+                        "ip-address": "192.168.1.10",
+                        "next-server": "0.0.0.0",
+                        "option-data": [],
+                        "server-hostname": ""
+                    }
+                ],
+                "store-extended-info": false,
+                "subnet": "192.168.1.0/24",
+                "t1-percent": 0.5,
+                "t2-percent": 0.875,
+                "valid-lifetime": 43200
+            }
+        ],
+        "t1-percent": 0.5,
+        "t2-percent": 0.875,
+        "valid-lifetime": 43200
+    }
+}
