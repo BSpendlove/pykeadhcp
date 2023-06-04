@@ -383,7 +383,7 @@ class Dhcp6Parser(GenericParser):
 
         Args:
             id:             Subnet ID
-            ip_address:     IPv4 address of the subnet
+            ip_address:     IPv6 address of the subnet
         """
         existing_subnet = self.get_subnet(id)
         if not existing_subnet:
