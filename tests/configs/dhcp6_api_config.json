@@ -1,0 +1,156 @@
+{
+    "Dhcp6": {
+        "calculate-tee-times": true,
+        "control-socket": {
+            "socket-name": "/tmp/kea6-ctrl-socket",
+            "socket-type": "unix"
+        },
+        "ddns-generated-prefix": "myhost",
+        "ddns-override-client-update": false,
+        "ddns-override-no-update": false,
+        "ddns-qualifying-suffix": "",
+        "ddns-replace-client-name": "never",
+        "ddns-send-updates": true,
+        "decline-probation-period": 86400,
+        "dhcp-ddns": {
+            "enable-updates": false,
+            "max-queue-size": 1024,
+            "ncr-format": "JSON",
+            "ncr-protocol": "UDP",
+            "sender-ip": "0.0.0.0",
+            "sender-port": 0,
+            "server-ip": "127.0.0.1",
+            "server-port": 53001
+        },
+        "dhcp-queue-control": {
+            "capacity": 64,
+            "enable-queue": false,
+            "queue-type": "kea-ring6"
+        },
+        "dhcp4o6-port": 0,
+        "expired-leases-processing": {
+            "flush-reclaimed-timer-wait-time": 25,
+            "hold-reclaimed-time": 3600,
+            "max-reclaim-leases": 100,
+            "max-reclaim-time": 250,
+            "reclaim-timer-wait-time": 10,
+            "unwarned-reclaim-cycles": 5
+        },
+        "hooks-libraries": [
+            {
+                "library": "/usr/local/lib/kea/hooks/libdhcp_lease_cmds.so",
+                "parameters": {}
+            },
+            {
+                "library": "/usr/local/lib/kea/hooks/libdhcp_subnet_cmds.so"
+            },
+            {
+                "library": "/usr/local/lib/kea/hooks/libdhcp_host_cmds.so"
+            }
+        ],
+        "host-reservation-identifiers": [
+            "hw-address",
+            "duid"
+        ],
+        "hostname-char-replacement": "",
+        "hostname-char-set": "[^A-Za-z0-9.-]",
+        "interfaces-config": {
+            "interfaces": [],
+            "re-detect": true
+        },
+        "lease-database": {
+            "persist": true,
+            "type": "memfile"
+        },
+        "loggers": [
+            {
+                "debuglevel": 99,
+                "name": "kea-dhcp6",
+                "output_options": [
+                    {
+                        "flush": true,
+                        "maxsize": 10000000,
+                        "maxver": 2,
+                        "output": "/usr/local/var/log/kea-dhcp6.log"
+                    }
+                ],
+                "severity": "INFO"
+            }
+        ],
+        "mac-sources": [
+            "any"
+        ],
+        "multi-threading": {
+            "enable-multi-threading": false,
+            "packet-queue-size": 64,
+            "thread-pool-size": 0
+        },
+        "option-data": [],
+        "option-def": [],
+        "preferred-lifetime": 3600,
+        "rebind-timer": 2000,
+        "relay-supplied-options": [
+            "65"
+        ],
+        "renew-timer": 1000,
+        "reservation-mode": "all",
+        "sanity-checks": {
+            "lease-checks": "warn"
+        },
+        "server-id": {
+            "enterprise-id": 0,
+            "htype": 0,
+            "identifier": "",
+            "persist": true,
+            "time": 0,
+            "type": "LLT"
+        },
+        "server-tag": "",
+        "shared-networks": [],
+        "statistic-default-sample-age": 0,
+        "statistic-default-sample-count": 20,
+        "store-extended-info": false,
+        "subnet6": [
+            {
+                "calculate-tee-times": true,
+                "id": 1,
+                "option-data": [],
+                "pd-pools": [
+                    {
+                        "delegated-len": 56,
+                        "option-data": [],
+                        "prefix": "2001:db8::",
+                        "prefix-len": 48
+                    }
+                ],
+                "pools": [
+                    {
+                        "option-data": [],
+                        "pool": "2001:db8:1000:6464::100-2001:db8:1000:6464::FFFF"
+                    }
+                ],
+                "preferred-lifetime": 432000,
+                "rapid-commit": false,
+                "rebind-timer": 302400,
+                "relay": {
+                    "ip-addresses": [
+                        "2001:db8:1000:6464::1"
+                    ]
+                },
+                "renew-timer": 115200,
+                "reservations": [],
+                "store-extended-info": false,
+                "subnet": "2001:db8:1000:6464::/64",
+                "t1-percent": 0.5,
+                "t2-percent": 0.8,
+                "user-context": {
+                    "comment": "some-subnet-comment"
+                },
+                "valid-lifetime": 604800
+            }
+        ],
+        "t1-percent": 0.5,
+        "t2-percent": 0.8,
+        "valid-lifetime": 4000
+    }
+}
