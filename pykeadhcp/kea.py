@@ -43,6 +43,7 @@ class Kea:
         username: str = "",
         password: str = "",
         raise_generic_errors: bool = False,
+        verify_ssl: bool = True,
     ):
         self.host = host
         self.port = port
@@ -52,6 +53,7 @@ class Kea:
         self.services = ["dhcp4", "dhcp6", "ddns", None]  # None = Control-Agent Daemon
         self.url = f"{self.host}:{self.port}"
         self.raise_generic_errors = raise_generic_errors
+        self.verify_ssl = verify_ssl
         self.RESPONSE_CODES = {
             1: KeaGenericException,
             2: KeaCommandNotSupportedException,
@@ -122,6 +124,7 @@ class Kea:
             json=body,
             headers=self.headers,
             auth=self.basic_auth if self.use_basic_auth else None,
+            verify=self.verify_ssl,
             **kwargs,
         )
 
