@@ -2,7 +2,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 from pykeadhcp.daemons import CtrlAgent, Ddns, Dhcp4, Dhcp6
 from pykeadhcp.models.generic import KeaResponse
@@ -32,6 +32,8 @@ class Kea:
             (as per self.RESPONSE_CODES). Set this to False if you want to catch the API endpoint specific
             errors such as `v4 Shared Network not found` vs `Code 3: the requested operation has been completed but the requested resource was not found.
             This status code is returned when a command returns no resources or affects no resources.`
+        verify:                 Boolean is used if the server TLS cert is verified or not, however you can
+            pass in a string which should be a path to a CA bundle to use with each request.
     """
 
     def __init__(
@@ -43,7 +45,7 @@ class Kea:
         username: str = "",
         password: str = "",
         raise_generic_errors: bool = False,
-        verify_ssl: bool = True,
+        verify: Union[bool, str] = True,
     ):
         self.host = host
         self.port = port
@@ -53,7 +55,7 @@ class Kea:
         self.services = ["dhcp4", "dhcp6", "ddns", None]  # None = Control-Agent Daemon
         self.url = f"{self.host}:{self.port}"
         self.raise_generic_errors = raise_generic_errors
-        self.verify_ssl = verify_ssl
+        self.verify = verify
         self.RESPONSE_CODES = {
             1: KeaGenericException,
             2: KeaCommandNotSupportedException,
@@ -124,7 +126,7 @@ class Kea:
             json=body,
             headers=self.headers,
             auth=self.basic_auth if self.use_basic_auth else None,
-            verify=self.verify_ssl,
+            verify=self.verify,
             **kwargs,
         )
 
