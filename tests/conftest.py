@@ -26,14 +26,39 @@ def pytest_addoption(parser):
         help="Port for Kea Server API",
         default=8000,
     )
+    parser.addoption(
+        "--disable-ssl-verify",
+        action="store_true",
+        dest="disable_ssl_verify",
+        default=False,
+        help="Disable SSL Verification when calling Kea class",
+    )
+    parser.addoption(
+        "--ssl-ca-bundle",
+        action="store",
+        dest="ssl_ca_bundle",
+        type=str,
+        help="CA Bundle if required to pass into requests module",
+        default=None,
+    )
 
 
 @pytest.fixture(scope="module")
 def kea_server(request: FixtureRequest):
     host = request.config.getoption("host")
     port = request.config.getoption("port", default=8000)
+    disable_ssl_verify = request.config.getoption("disable_ssl_verify", default=False)
+    ssl_ca_bundle = request.config.getoption("ssl_ca_bundle", default=None)
 
-    return Kea(host=host, port=port)
+    return Kea(
+        host=host,
+        port=port,
+        verify=False
+        if disable_ssl_verify
+        else True
+        if not ssl_ca_bundle
+        else ssl_ca_bundle,
+    )
 
 
 def read_local_config(filename: str):

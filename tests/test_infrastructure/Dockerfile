@@ -77,6 +77,9 @@ RUN [ "${KEA_PREMIUM}" != "premium" ] || ( \
         isc-kea-premium-forensic-log=${KEA_VERSION} \
         isc-kea-premium-host-cache=${KEA_VERSION} \
         isc-kea-premium-radius=${KEA_VERSION} \
+        isc-kea-premium-flex-id=${KEA_VERSION} \
+        isc-kea-premium-subnet-cmds=${KEA_VERSION} \
+        isc-kea-premium-lease-cmds=${KEA_VERSION} \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/ \

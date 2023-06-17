@@ -1,5 +1,7 @@
 {
     "Control-agent": {
+        "cert-file": "/etc/kea/cert.pem",
+        "cert-required": false,
         "control-sockets": {
             "d2": {
                 "socket-name": "/tmp/kea-ddns-ctrl-socket",
@@ -17,12 +19,14 @@
         "hooks-libraries": [],
         "http-host": "0.0.0.0",
         "http-port": 8080,
+        "key-file": "/etc/kea/key.pem",
         "loggers": [
             {
                 "debuglevel": 0,
                 "name": "kea-ctrl-agent",
                 "severity": "INFO"
             }
-        ]
+        ],
+        "trust-anchor": "my-ca"
     }
 }

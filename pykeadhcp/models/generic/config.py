@@ -1,16 +1,13 @@
 from typing import Optional, List, Union
-from pykeadhcp.models.generic.base import KeaBaseModel
+from pykeadhcp.models.generic.base import KeaModel
 from pykeadhcp.models.generic.hook import Hook
 from pykeadhcp.models.generic.logger import Logger
 from pykeadhcp.models.generic.option_data import OptionData
 from pykeadhcp.models.enums import ReservationMode, DDNSReplaceClientNameEnum
 
 
-class CommonConfig(KeaBaseModel):
+class CommonConfig(KeaModel):
     store_extended_info: Optional[bool]
-    user_context: Optional[dict]
-    comment: Optional[str]
-    unknown_map_entry: Optional[str]
 
 
 class CommonDhcpConfig(CommonConfig):
