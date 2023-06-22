@@ -1,6 +1,34 @@
 {
     "Dhcp6": {
         "calculate-tee-times": true,
+        "client-classes": [
+            {
+                "name": "Client_enterprise1",
+                "test": "substring(option[1].hex,0,6) == 0x0002AABBCCDD",
+                "option-data": [
+                    {
+                        "name": "dns-servers",
+                        "code": 23,
+                        "space": "dhcp6",
+                        "csv-format": true,
+                        "data": "2001:db8:0::1, 2001:db8:2::1"
+                    }
+                ]
+            },
+            {
+                "name": "Client_enterprise2",
+                "test": "substring(option[1].hex,0,6) == 0x0002AABBCCFF",
+                "option-data": [
+                    {
+                        "name": "dns-servers",
+                        "code": 23,
+                        "space": "dhcp6",
+                        "csv-format": true,
+                        "data": "2001:db8:0::33, 2001:db8:2::44"
+                    }
+                ]
+            }
+        ],
         "control-socket": {
             "socket-name": "/tmp/kea6-ctrl-socket",
             "socket-type": "unix"
