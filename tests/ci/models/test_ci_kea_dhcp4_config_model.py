@@ -15,6 +15,13 @@ def test_ci_kea_dhcp4_config_model_hooks(dhcp4_model: Dhcp4DaemonConfig):
         assert hook_library.library
 
 
+def test_ci_kea_dhcp4_config_client_classes(dhcp4_model: Dhcp4DaemonConfig):
+    assert len(dhcp4_model.client_classes) > 0
+    for client_class in dhcp4_model.client_classes:
+        assert client_class.name
+        assert len(client_class.option_data) > 0
+
+
 def test_ci_kea_dhcp4_config_model_host_reservation_identifiers(
     dhcp4_model: Dhcp4DaemonConfig,
 ):
