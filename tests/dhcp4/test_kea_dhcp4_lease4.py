@@ -24,6 +24,11 @@ def test_kea_dhcp4_lease4_get_non_exsistent(kea_server: Kea):
         kea_server.dhcp4.lease4_get(ip_address="192.0.2.32")
 
 
+def test_kea_dhcp4_lease4_get_all_none(kea_server: Kea):
+    with pytest.raises(KeaLeaseNotFoundException):
+        kea_server.dhcp4.lease4_get_all()
+
+
 def test_kea_dhcp4_lease4_add(kea_server: Kea):
     # Add Temporary Subnet
     data = Subnet4(id=40123, subnet="192.0.2.32/31")
@@ -50,6 +55,11 @@ def test_kea_dhcp4_lease4_get(kea_server: Kea):
 
 
 def test_kea_dhcp4_lease4_get_all(kea_server: Kea):
+    response = kea_server.dhcp4.lease4_get_all()
+    assert len(response) > 0
+
+
+def test_kea_dhcp4_lease4_get_all_subnets(kea_server: Kea):
     response = kea_server.dhcp4.lease4_get_all(subnets=[40123])
     assert len(response) > 0
 

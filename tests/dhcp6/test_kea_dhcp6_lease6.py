@@ -24,6 +24,11 @@ def test_kea_dhcp6_lease6_get_non_exsistent(kea_server: Kea):
         kea_server.dhcp6.lease6_get(ip_address="2001:db8::32")
 
 
+def test_kea_dhcp4_lease6_get_all_none(kea_server: Kea):
+    with pytest.raises(KeaLeaseNotFoundException):
+        kea_server.dhcp6.lease6_get_all()
+
+
 def test_kea_dhcp6_lease6_add(kea_server: Kea):
     # Add Temporary Subnet
     data = Subnet6(id=40123, subnet="2001:db8::/64")
@@ -46,7 +51,12 @@ def test_kea_dhcp6_lease6_get(kea_server: Kea):
     assert response.iaid == 1234
 
 
-def test_kea_dhcp6_lease6_get_all(kea_server: Kea):
+def test_kea_dhcp4_lease6_get_all(kea_server: Kea):
+    response = kea_server.dhcp6.lease6_get_all()
+    assert len(response) > 0
+
+
+def test_kea_dhcp6_lease6_get_all_subnets(kea_server: Kea):
     response = kea_server.dhcp6.lease6_get_all(subnets=[40123])
     assert len(response) > 0
 

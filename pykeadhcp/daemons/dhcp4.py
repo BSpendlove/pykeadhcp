@@ -231,12 +231,19 @@ class Dhcp4:
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#lease4-get-all
         """
-        data = self.api.send_command_with_arguments(
-            command="lease4-get-all",
-            service=self.service,
-            arguments={"subnets": subnets},
-            required_hook="lease_cmds",
-        )
+        if subnets:
+            data = self.api.send_command_with_arguments(
+                command="lease4-get-all",
+                service=self.service,
+                arguments={"subnets": subnets},
+                required_hook="lease_cmds",
+            )
+        else:
+            data = self.api.send_command(
+                command="lease4-get-all",
+                service=self.service,
+                required_hook="lease_cmds",
+            )
 
         if data.result == 3:
             raise KeaLeaseNotFoundException(data.text)
