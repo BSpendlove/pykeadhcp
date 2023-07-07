@@ -67,11 +67,23 @@ class KeaSharedNetworkNotFoundException(KeaException):
 
 class KeaSubnetNotFoundException(KeaException):
     def __init__(self, subnet_id: int):
-        self.message = f"Subnet with id '{subnet_id}' not found"
+        self.message = f"Subnet '{subnet_id}' not found"
         super().__init__(self.message)
 
 
 class KeaLeaseNotFoundException(KeaException):
     def __init__(self, lease: str):
         self.message = f"Lease '{lease}' not found"
+        super().__init__(self.message)
+
+
+class KeaInvalidRemoteMapException(KeaException):
+    def __init__(self, detailed_error: str):
+        self.message = f"Remote map for cm_cmd remote API call is not correctly formatted. Detailed Error: {detailed_error}"
+        super().__init__(self.message)
+
+
+class KeaRemoteServerNotFoundException(KeaException):
+    def __init__(self, server_tag: str):
+        self.message = f"Server with server_tag '{server_tag}' not found"
         super().__init__(self.message)

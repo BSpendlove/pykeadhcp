@@ -45,7 +45,7 @@ RUN apt-get update \
 SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 ARG KEA_REPO
 ARG KEA_VERSION
-RUN wget --no-verbose -O- https://dl.cloudsmith.io/${KEA_REPO}/setup.deb.sh | bash \
+RUN curl https://dl.cloudsmith.io/${KEA_REPO}/setup.deb.sh | bash \
         && apt-get update \
         && apt-get install \
         --no-install-recommends \
@@ -79,7 +79,8 @@ RUN [ "${KEA_PREMIUM}" != "premium" ] || ( \
         isc-kea-premium-radius=${KEA_VERSION} \
         isc-kea-premium-flex-id=${KEA_VERSION} \
         isc-kea-premium-subnet-cmds=${KEA_VERSION} \
-        isc-kea-premium-lease-cmds=${KEA_VERSION} \
+        isc-kea-premium-host-cmds=${KEA_VERSION} \
+        isc-kea-premium-cb-cmds=${KEA_VERSION} \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/ \
