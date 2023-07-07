@@ -14,6 +14,7 @@ from pykeadhcp.exceptions import (
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
     KeaRemoteServerNotFoundException,
+    KeaConfigBackendNotConfiguredException,
 )
 
 
@@ -56,6 +57,21 @@ class Dhcp4:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-build-report
         """
         return self.api.send_command(command="build-report", service=self.service)
+
+    def config_backend_pull(self) -> KeaResponse:
+        """Forces an immediate update of the servers using the configuration database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#config-backend-pull
+        """
+        data = self.api.send_command(
+            command="config-backend-pull", service=self.service
+        )
+
+        if data.result == 3:
+            raise KeaConfigBackendNotConfiguredException
+
+        return data
 
     def config_get(self) -> KeaResponse:
         """Retrieves the current configuration used by the server
@@ -594,6 +610,31 @@ class Dhcp4:
         shared_network = data.arguments["shared-networks"][0]
         return SharedNetwork4.parse_obj(shared_network)
 
+    def remote_network4_list(
+        self, server_tags: List[str], remote_map: dict = {}
+    ) -> List[SharedNetwork4]:
+        """Gets all shared networks in the configuration database:
+
+        Args:
+            server_tags:        List of server tags (at least 1 one must be present)
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network4-list
+        """
+        data = self.api.send_command_remote(
+            command="remote-network4-list",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        shared_networks = [
+            SharedNetwork4.parse_obj(shared_network)
+            for shared_network in data.arguments["shared-networks"]
+        ]
+        return shared_networks
+
     def remote_network4_set(
         self,
         shared_networks: List[SharedNetwork4],
@@ -729,7 +770,7 @@ class Dhcp4:
     def remote_subnet4_del_by_id(
         self, subnet_id: int, remote_map: dict = {}
     ) -> KeaResponse:
-        """Delets a subnet from the configuration database
+        """Deletes a subnet from the configuration database
 
         Args:
             subnet_id:      Subnet ID
@@ -742,6 +783,22 @@ class Dhcp4:
             command="remote-subnet4-del-by-id",
             service=self.service,
             arguments={"subnets": [{"id": subnet_id}]},
+            remote_map=remote_map,
+        )
+
+    def remote_subnet4_del_by_prefix(
+        self, prefix: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a subnet from the configuration database
+
+        Args:
+            prefix:         Subnet Prefix
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        return self.api.send_command_remote(
+            command="remote-subnet4-del-by-prefix",
+            service=self.service,
+            arguments={"subnets": [{"subnet": prefix}]},
             remote_map=remote_map,
         )
 
@@ -767,10 +824,10 @@ class Dhcp4:
         if data.result == 3:
             raise KeaSubnetNotFoundException(subnet_id)
 
-        if not data.arguments["subnet4"]:
+        if not data.arguments.get("subnets"):
             return None
 
-        subnet = data.arguments["subnet4"][0]
+        subnet = data.arguments["subnets"][0]
         return Subnet4.parse_obj(subnet)
 
     def remote_subnet4_get_by_prefix(
@@ -787,7 +844,7 @@ class Dhcp4:
         """
         data = self.api.send_command_remote(
             command="remote-subnet4-get-by-prefix",
-            service=self.serivce,
+            service=self.service,
             arguments={"subnets": [{"subnet": prefix}]},
             remote_map=remote_map,
         )
@@ -795,10 +852,10 @@ class Dhcp4:
         if data.result == 3:
             raise KeaSubnetNotFoundException(prefix)
 
-        if not data.arguments["subnet4"]:
+        if not data.arguments.get("subnets"):
             return None
 
-        subnet = data.arguments["subnet4"][0]
+        subnet = data.arguments["subnets"][0]
         return Subnet4.parse_obj(subnet)
 
     def remote_subnet4_list(
@@ -825,7 +882,7 @@ class Dhcp4:
 
     def remote_subnet4_set(
         self,
-        subnets: List[Subnet4],
+        subnet: Subnet4,
         server_tags: List[str],
         remote_map: dict = {},
     ) -> KeaResponse:
@@ -845,8 +902,11 @@ class Dhcp4:
             service=self.service,
             arguments={
                 "subnets": [
-                    subnet.dict(exclude_none=True, exclude_unset=True, by_alias=True)
-                    for subnet in subnets
+                    subnet.dict(
+                        exclude_none=True if subnet.shared_network_name else False,
+                        exclude_unset=True,
+                        by_alias=True,
+                    )
                 ],
                 "server-tags": server_tags,
             },

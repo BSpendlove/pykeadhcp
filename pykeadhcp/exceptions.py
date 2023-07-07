@@ -87,3 +87,9 @@ class KeaRemoteServerNotFoundException(KeaException):
     def __init__(self, server_tag: str):
         self.message = f"Server with server_tag '{server_tag}' not found"
         super().__init__(self.message)
+
+
+class KeaConfigBackendNotConfiguredException(KeaException):
+    def __init__(self):
+        self.message = "Kea API reports that there is no configuration backends"
+        super().__init__(self.message)
