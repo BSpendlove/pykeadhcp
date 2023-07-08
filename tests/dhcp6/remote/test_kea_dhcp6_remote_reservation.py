@@ -29,7 +29,7 @@ reservation-del non existent
 
 
 def test_kea_dhcp6_remote_reservation_prepare(kea_server: Kea):
-    subnet = Subnet6(id=40123, subnet="192.0.2.32/31")
+    subnet = Subnet6(id=40123, subnet="2001:db8::32/127")
     response = kea_server.dhcp6.remote_subnet6_set(subnet=subnet, server_tags=["all"])
     assert response.result == 0
 
@@ -38,8 +38,8 @@ def test_kea_dhcp6_remote_reservation_get_non_existent(kea_server: Kea):
     with pytest.raises(KeaReservationNotFoundException):
         kea_server.dhcp6.reservation_get_by_identifier(
             subnet_id=40123,
-            identifier_type="hw-address",
-            identifier="aa:bb:cc:dd:ee:ff",
+            identifier_type="duid",
+            identifier="00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff",
         )
 
 
@@ -48,8 +48,8 @@ def test_kea_dhcp6_remote_reservation_add(kea_server: Kea):
     assert backend_updated.result == 0
 
     response = kea_server.dhcp6.reservation_add(
-        ip_address="192.0.2.33",
-        hw_address="aa:bb:cc:dd:ee:ff",
+        ip_address="2001:db8::33",
+        duid="00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff",
         hostname="pykeadhcp-reservation",
         subnet_id=40123,
     )
@@ -58,8 +58,8 @@ def test_kea_dhcp6_remote_reservation_add(kea_server: Kea):
 
 def test_kea_dhcp6_remote_reservation_add_existing(kea_server: Kea):
     response = kea_server.dhcp6.reservation_add(
-        ip_address="192.0.2.33",
-        hw_address="aa:bb:cc:dd:ee:ff",
+        ip_address="2001:db8::33",
+        duid="00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff",
         hostname="pykeadhcp-reservation",
         subnet_id=40123,
     )
@@ -75,12 +75,12 @@ def test_kea_dhcp6_remote_reservation_get_all(kea_server: Kea):
 
 def test_kea_dhcp6_remote_reservation_get_by_ip(kea_server: Kea):
     reservation = kea_server.dhcp6.reservation_get_by_ip_address(
-        subnet_id=40123, ip_address="192.0.2.33"
+        subnet_id=40123, ip_address="2001:db8::33"
     )
     assert reservation
     assert reservation.hostname == "pykeadhcp-reservation"
-    assert reservation.hw_address == "aa:bb:cc:dd:ee:ff"
-    assert reservation.ip_address == "192.0.2.33"
+    assert reservation.duid == "00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff"
+    assert "2001:db8:33" not in [ip for ip in reservation.ip_addresses]
 
 
 def test_kea_dhcp6_remote_reservation_get_by_hostname(kea_server: Kea):
@@ -93,12 +93,12 @@ def test_kea_dhcp6_remote_reservation_get_by_hostname(kea_server: Kea):
 
 
 def test_kea_dhcp6_remote_reservation_get_by_identifier(kea_server: Kea):
-    hw_address = "aa:bb:cc:dd:ee:ff"
+    duid = "00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff"
     reservation = kea_server.dhcp6.reservation_get_by_identifier(
-        subnet_id=40123, identifier_type="hw-address", identifier=hw_address
+        subnet_id=40123, identifier_type="duid", identifier=duid
     )
     assert reservation
-    assert reservation.hw_address == hw_address
+    assert reservation.duid == duid
 
 
 def test_kea_dhcp6_remote_reservation_get_page(kea_server: Kea):
@@ -113,8 +113,10 @@ def test_kea_dhcp6_remote_reservation_get_page_bad_source(kea_server: Kea):
 
 
 def test_kea_dhcp6_remote_reservation_del(kea_server: Kea):
-    response = kea_server.dhcp6.reservation_del_by_ip(
-        subnet_id=40123, ip_address="192.0.2.33"
+    response = kea_server.dhcp6.reservation_del_by_identifier(
+        subnet_id=40123,
+        identifier_type="duid",
+        identifier="00:01:00:01:17:96:f9:3a:aa:bb:cc:dd:ee:ff",
     )
     assert response.result == 0
 

@@ -10,6 +10,7 @@ from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
 from pykeadhcp.models.dhcp6.subnet import Subnet6
+from pykeadhcp.models.enums import HostReservationIdentifierEnum
 from pykeadhcp.exceptions import (
     KeaException,
     KeaSharedNetworkNotFoundException,
@@ -17,6 +18,8 @@ from pykeadhcp.exceptions import (
     KeaLeaseNotFoundException,
     KeaConfigBackendNotConfiguredException,
     KeaRemoteServerNotFoundException,
+    KeaUnknownHostReservationTypeException,
+    KeaReservationNotFoundException,
 )
 
 
@@ -841,6 +844,232 @@ class Dhcp6:
             },
             remote_map=remote_map,
         )
+
+    def reservation_add(self, ip_address: str, **kwargs) -> KeaResponse:
+        """Creates a new host reservation
+
+        Args:
+            reservation:        Reservation Object
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-add
+        """
+        reservation = Reservation6(ip_addresses=[ip_address], **kwargs)
+
+        return self.api.send_command_with_arguments(
+            command="reservation-add",
+            service=self.service,
+            arguments={
+                "reservation": reservation.dict(
+                    exclude_none=True, exclude_unset=True, by_alias=True
+                )
+            },
+            required_hook="host_cmds",
+        )
+
+    def reservation_del_by_ip(self, ip_address: str, subnet_id: int) -> KeaResponse:
+        """Delete a reservation in the host database based on IP and subnet ID
+
+        Args:
+            ip_address:     IP address of the reservation
+            subnet_id:      Subnet ID reservation belongs to
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-del
+        """
+        return self.api.send_command_with_arguments(
+            command="reservation-del",
+            service=self.service,
+            arguments={"subnet-id": subnet_id, "ip-address": ip_address},
+            required_hook="host_cmds",
+        )
+
+    def reservation_del_by_identifier(
+        self,
+        subnet_id: int,
+        identifier_type: HostReservationIdentifierEnum,
+        identifier: str,
+    ) -> KeaResponse:
+        """Delete a reservation in the host database based on IP and subnet ID
+
+        Args:
+            subnet_id:          Subnet ID reservation belongs to
+            identifier_type:    Identifier Type
+            identifier:         Identifier Data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-del
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException
+
+        return self.api.send_command_with_arguments(
+            command="reservation-del",
+            service=self.service,
+            arguments={
+                "subnet-id": subnet_id,
+                "identifier-type": identifier_type,
+                "identifier": identifier,
+            },
+            required_hook="host_cmds",
+        )
+
+    def reservation_get_by_ip_address(
+        self, subnet_id: int, ip_address: str
+    ) -> Reservation6:
+        """Gets an existing host reservation
+
+        Args:
+            ip_address:     IP address of the reservation
+            subnet_id:      Subnet ID reservation belongs to
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get
+        """
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get",
+            service=self.service,
+            arguments={"subnet-id": subnet_id, "ip-address": ip_address},
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(reservation_data=ip_address)
+
+        return Reservation6.parse_obj(data.arguments)
+
+    def reservation_get_by_identifier(
+        self,
+        subnet_id: int,
+        identifier_type: HostReservationIdentifierEnum,
+        identifier: str,
+    ) -> Reservation6:
+        """Gets an existing host reservation
+
+        Args:
+            subnet_id:          Subnet ID
+            identifier_type:    Identifier Type
+            identifier:         Identifier Data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get",
+            service=self.service,
+            arguments={
+                "subnet-id": subnet_id,
+                "identifier-type": identifier_type,
+                "identifier": identifier,
+            },
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(
+                reservation_data=f"({identifier_type}) {identifier}"
+            )
+
+        return Reservation6.parse_obj(data.arguments)
+
+    def reservation_get_all(self, subnet_id: int) -> List[Reservation6]:
+        """Gets all host reservations for a given subnet id
+
+        Args:
+            subnet_id:      Subnet ID
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-all
+        """
+        reservations = self.api.send_command_with_arguments(
+            command="reservation-get-all",
+            service=self.service,
+            arguments={"subnet-id": subnet_id},
+            required_hook="host_cmds",
+        )
+
+        return [
+            Reservation6.parse_obj(reservation)
+            for reservation in reservations.arguments.get("hosts")
+        ]
+
+    def reservation_get_by_hostname(
+        self, hostname: str, subnet_id: int
+    ) -> Reservation6:
+        """Gets a reservation based on a hostname
+
+        Args:
+            hostname:       Reservation Hostname
+            subnet_id:      Subnet ID
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-by-hostname
+        """
+        data = self.api.send_command_with_arguments(
+            command="reservation-get-by-hostname",
+            service=self.service,
+            arguments={"hostname": hostname, "subnet-id": subnet_id},
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(
+                reservation_data=f"(hostname) {hostname}"
+            )
+
+        if not data.arguments.get("hosts"):
+            return None
+
+        return Reservation6.parse_obj(data.arguments["hosts"][0])
+
+    def reservation_get_page(
+        self,
+        subnet_id: int = None,
+        limit: int = 1000,
+        source_index: int = 0,
+        from_host_id: int = 0,
+    ) -> List[Reservation6]:
+        """Gathers all host reservations with paging functionality
+
+        Args:
+            subnet_id:      Subnet ID to filter if provided
+            limit:          Limit reservations to return
+            source_index:   Refer to https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-reservation-get-page
+            from_host_id:   Refer to https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-reservation-get-page
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-page
+        """
+        params = {"limit": limit, "source-index": source_index, "from": from_host_id}
+
+        if subnet_id:
+            params["subnet-id"] = subnet_id
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get-page",
+            service=self.service,
+            arguments=params,
+            required_hook="host_cmds",
+        )
+
+        if data.result == 1:
+            raise KeaException(message=data.text)
+
+        if not data.arguments or not data.arguments.get("hosts"):
+            return None
+
+        return [
+            Reservation6.parse_obj(reservation)
+            for reservation in data.arguments["hosts"]
+        ]
 
     def shutdown(self) -> KeaResponse:
         """Instructs the server daemon to initiate its shutdown procedure
