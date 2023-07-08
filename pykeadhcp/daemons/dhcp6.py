@@ -481,17 +481,84 @@ class Dhcp6:
             required_hook="subnet_cmds",
         )
 
-    def remote_global_parameter6_del(self):
-        pass
+    def remote_global_parameter6_del(
+        self, parameter: str, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a global DHCPv6 parameter from the configuration database
 
-    def remote_global_parameter6_get(self):
-        pass
+        Args:
+            parameter:      Parameter to delete
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_global_parameter6_get_all(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter6-del
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter6-del",
+            service=self.service,
+            arguments={"parameters": [parameter], "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
 
-    def remote_global_parameter6_set(self):
-        pass
+    def remote_global_parameter6_get(
+        self, parameter: str, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Get a specific global parameter from the configuration database
+
+        Args:
+            parameter:      Parameter to delete
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter6-get
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter6-get",
+            service=self.service,
+            arguments={"parameters": [parameter], "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_global_parameter6_get_all(
+        self, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Gets all global parameter from the configuration database
+
+        Args:
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter6-get-all
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter6-get-all",
+            service=self.service,
+            arguments={"server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_global_parameter6_set(
+        self, parameters: dict, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Updates one or more global parameters in the configuration database
+
+        Args:
+            parameters:     Dictionary of parameters (key) and their config (values)
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter6-set
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter6-set",
+            service=self.service,
+            arguments={"parameters": parameters, "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
 
     def remote_option_def6_del(self):
         pass
