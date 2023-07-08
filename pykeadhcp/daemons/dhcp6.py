@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 from pykeadhcp.models.generic import KeaResponse, StatusGet
 from pykeadhcp.models.generic.remote_server import RemoteServer
 from pykeadhcp.models.generic.option_def import OptionDef
+from pykeadhcp.models.generic.option_data import OptionData
 from pykeadhcp.models.dhcp6.lease import Lease6, Lease6Page, Lease6TypeEnum
 from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
@@ -664,35 +665,333 @@ class Dhcp6:
             remote_map=remote_map,
         )
 
-    def remote_option6_global_del(self):
-        pass
+    def remote_option6_global_del(
+        self,
+        option_code: int,
+        option_space: str,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 global option defined in the configuration database
 
-    def remote_option6_global_get(self):
-        pass
+        Args:
+            option_code:    Option Code
+            option_space:   Option Space
+            server_tag:     Single Server Tag
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option6_global_get_all(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-global-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-global-del",
+            service=self.service,
+            arguments={
+                "options": [{"code": option_code, "space": option_space}],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
 
-    def remote_option6_global_set(self):
-        pass
+    def remote_option6_global_get(
+        self,
+        option_code: int,
+        option_space: str,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Gets a DHCPv6 global option defined in the configuration database
 
-    def remote_option6_network_del(self):
-        pass
+        Args:
+            option_code:    Option Code
+            option_space:   Option Space
+            server_tag:     Single Server Tag
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option6_network_set(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-global-get
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-global-get",
+            service=self.service,
+            arguments={
+                "options": [{"code": option_code, "space": option_space}],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
 
-    def remote_option6_pool_del(self):
-        pass
+    def remote_option6_global_get_all(
+        self,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Gets all DHCPv6 global option defined in the configuration database
 
-    def remote_option6_pool_set(self):
-        pass
+        Args:
+            server_tag:     Single Server Tag
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option6_subnet_del(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-global-get-all
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-global-get-all",
+            service=self.service,
+            arguments={
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
 
-    def remote_option6_subnet_set(self):
-        pass
+    def remote_option6_global_set(
+        self,
+        option_data: OptionData,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv6 option defined in the configuration database
+
+        Args:
+            option_data:    OptionData Object
+            server_tag:     Single Server Tag
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-global-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-global-set",
+            service=self.service,
+            arguments={
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_network_del(
+        self,
+        shared_network: str,
+        option_code: int,
+        option_space: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 option from a shared network in the configuration database
+
+        Args:
+            shared_network:     Name of shared network
+            option_code:        Option Code
+            option_space:       Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-network-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-network-del",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": shared_network}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_network_set(
+        self,
+        shared_network: str,
+        option_data: OptionData,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 option from a shared network in the configuration database
+
+        Args:
+            shared_network:     Name of shared network
+            option_data:        OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-network-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-network-set",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": shared_network}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_pd_pool_del(
+        self,
+        prefix: str,
+        prefix_len: int,
+        option_code: int,
+        option_space: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Deletes a DHCPv6 option from a prefix delegation pool in the configuration database
+
+        Args:
+            prefix:         Delegated Prefix
+            prefix_len:     Delegated Prefix Length
+            option_code:    Option Code
+            option_space:   Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-pd-pool-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-pd-pool-del",
+            service=self.service,
+            arguments={
+                "pd-pools": [{"prefix": prefix, "prefix-len": prefix_len}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_pd_pool_set(
+        self,
+        prefix: str,
+        prefix_len: int,
+        option_data: OptionData,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv6 option in a prefix delegation pool in the configuration database
+
+        Args:
+            prefix:         Delegated Prefix
+            prefix_len:     Delegated Prefix Length
+            option_data:    OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-pd-pool-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-pd-pool-set",
+            service=self.service,
+            arguments={
+                "pd-pools": [{"prefix": prefix, "prefix-len": prefix_len}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_pool_del(
+        self, pool: str, option_code: int, option_space: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a DHCPv6 option from an address pool in the configuration database
+
+        Args:
+            pool:           Pool Range
+            option_code:    Option Code
+            option_space:   Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-pool-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-pool-del",
+            service=self.service,
+            arguments={
+                "pools": [{"pool": pool}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_pool_set(
+        self, pool: str, option_data: OptionData, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv6 option in an address pool in the configuration database
+
+        Args:
+            pool:           Pool Range
+            option_data:    OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-pool-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-pool-set",
+            service=self.service,
+            arguments={
+                "pools": [{"pool": pool}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_subnet_del(
+        self, subnet_id: int, option_code: int, option_space: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a DHCPv6 option from a subnet in the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            option_code:    Option Code
+            option_space:   Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option6-subnet-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-subnet-del",
+            service=self.service,
+            arguments={
+                "subnets": [{"id": subnet_id}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option6_subnet_set(
+        self, subnet_id: int, option_data: OptionData, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv6 option in a subnet in the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            option_data:    OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        return self.api.send_command_remote(
+            command="remote-option6-subnet-set",
+            service=self.service,
+            arguments={
+                "subnets": [{"id": subnet_id}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
 
     def remote_network6_del(
         self, name: str, keep_subnets: bool = True, remote_map: dict = {}
