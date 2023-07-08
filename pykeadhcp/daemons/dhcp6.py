@@ -5,6 +5,7 @@ if TYPE_CHECKING:
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
 from pykeadhcp.models.generic.remote_server import RemoteServer
+from pykeadhcp.models.generic.option_def import OptionDef
 from pykeadhcp.models.dhcp6.lease import Lease6, Lease6Page, Lease6TypeEnum
 from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
@@ -560,17 +561,108 @@ class Dhcp6:
             remote_map=remote_map,
         )
 
-    def remote_option_def6_del(self):
-        pass
+    def remote_option_def6_del(
+        self,
+        option_code: int,
+        option_space: str,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 option defined in the configuration database
 
-    def remote_option_def6_get(self):
-        pass
+        Args:
+            option_code:    Option Code
+            option_space:   Option Space
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option_def6_get_all(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def6-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option-def6-del",
+            service=self.service,
+            arguments={
+                "option-defs": [{"code": option_code, "space": option_space}],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
 
-    def remote_option_def6_set(self):
-        pass
+    def remote_option_def6_get(
+        self,
+        option_code: int,
+        option_space: str,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 option defined in the configuration database
+
+        Args:
+            option_code:    Option Code
+            option_space:   Option Space
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def6-get
+        """
+        return self.api.send_command_remote(
+            command="remote-option-def6-get",
+            service=self.service,
+            arguments={
+                "option-defs": [{"code": option_code, "space": option_space}],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option_def6_get_all(self, server_tag: str, remote_map: dict = {}):
+        """Fetches all Dhcpv6 option defs from the configuration database
+
+        Args:
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def6-get-all
+        """
+        return self.api.send_command_remote(
+            command="remote-option-def6-get-all",
+            service=self.service,
+            arguments={"server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_option_def6_set(
+        self,
+        option_def: OptionDef,
+        server_tag: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv6 option defined in the configuration database
+
+        Args:
+            option_def:     OptionDef Object
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def63-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option-def6-set",
+            service=self.service,
+            arguments={
+                "option-defs": [
+                    option_def.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+                "server-tags": [server_tag],
+            },
+            remote_map=remote_map,
+        )
 
     def remote_option6_global_del(self):
         pass
