@@ -50,22 +50,22 @@ def test_kea_dhcp6_remote_network6_get(kea_server: Kea, db_remote_map: dict):
     assert shared_network.name == name
 
 
-def test_kea_dhcp6_remote_subnet4_add_subnet(kea_server: Kea, db_remote_map: dict):
+def test_kea_dhcp6_remote_subnet6_add_subnet(kea_server: Kea, db_remote_map: dict):
     name = "pykeadhcp-pytest"
 
     # Create Temporary Subnet
-    subnet = Subnet6(subnet="192.0.2.32/31", id=40123, shared_network_name=name)
+    subnet = Subnet6(subnet="2001:db8::32/127", id=40123, shared_network_name=name)
 
     # Create subnet with shared network assosication
-    response = kea_server.dhcp6.remote_subnet4_set(
+    response = kea_server.dhcp6.remote_subnet6_set(
         subnet=subnet, server_tags=["all"], remote_map=db_remote_map
     )
     assert response.result == 0
     assert len(response.arguments.get("subnets", [])) > 0
 
 
-def test_kea_dhcp6_remote_subnet4_del_by_id(kea_server: Kea, db_remote_map: dict):
-    response = kea_server.dhcp6.remote_subnet4_del_by_id(
+def test_kea_dhcp6_remote_subnet6_del_by_id(kea_server: Kea, db_remote_map: dict):
+    response = kea_server.dhcp6.remote_subnet6_del_by_id(
         subnet_id=40123, remote_map=db_remote_map
     )
     assert response.result == 0

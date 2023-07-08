@@ -11,6 +11,7 @@ from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
 from pykeadhcp.models.dhcp6.subnet import Subnet6
 from pykeadhcp.exceptions import (
+    KeaException,
     KeaSharedNetworkNotFoundException,
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
@@ -475,6 +476,123 @@ class Dhcp6:
             service=self.service,
             arguments={"name": name, "id": subnet_id},
             required_hook="subnet_cmds",
+        )
+
+    def remote_network6_del(
+        self, name: str, keep_subnets: bool = True, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes an existing Shared Network from the configuration database
+
+        Args:
+            name:           Name of shared network
+            keep_subnets:   Keeps any existing subnets if True
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network6-del
+        """
+        return self.api.send_command_remote(
+            command="remote-network6-del",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": name}],
+                "subnets-action": "keep" if keep_subnets else "delete",
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_network6_get(
+        self, name: str, include_subnets: bool = True, remote_map: dict = {}
+    ) -> SharedNetwork6:
+        """Returns detailed information about a shared network, including subnets
+
+        Args:
+            name:               Name of shared network
+            include_subnets:    Include detailed information about subnets
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network6-get
+        """
+        data = self.api.send_command_remote(
+            command="remote-network6-get",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": name}],
+                "subnets-include": "full" if include_subnets else "no",
+            },
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaSharedNetworkNotFoundException(name)
+
+        if not data.arguments["shared-networks"]:
+            return None
+
+        shared_network = data.arguments["shared-networks"][0]
+        return SharedNetwork6.parse_obj(shared_network)
+
+    def remote_network6_list(
+        self, server_tags: List[str], remote_map: dict = {}
+    ) -> List[SharedNetwork6]:
+        """Gets all shared networks in the configuration database:
+
+        Args:
+            server_tags:        List of server tags (at least 1 one must be present)
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network6-list
+        """
+        data = self.api.send_command_remote(
+            command="remote-network6-list",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        shared_networks = [
+            SharedNetwork6.parse_obj(shared_network)
+            for shared_network in data.arguments["shared-networks"]
+        ]
+        return shared_networks
+
+    def remote_network6_set(
+        self,
+        shared_networks: List[SharedNetwork6],
+        server_tags: List[str],
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Adds or replaces shared-network configuration in the configuration database
+
+        Args:
+            shared_networks:    List of shared networks to add
+            server_tags:        List of server tags (at least 1 one must be present)
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network6-set
+        """
+
+        # Shared networks must not contain subnets in this API call
+        for shared_network in shared_networks:
+            if shared_network.subnet6:
+                raise KeaException(
+                    message=f"Shared Network {shared_network.name} contains a list of 1 or more subnets. Please refer to documentation on how to use this command."
+                )
+
+        return self.api.send_command_remote(
+            command="remote-network6-set",
+            service=self.service,
+            arguments={
+                "shared-networks": [
+                    network.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for network in shared_networks
+                ],
+                "server-tags": server_tags,
+            },
+            remote_map=remote_map,
         )
 
     def remote_server6_del(self, servers: List[str], remote_map: dict = {}):
