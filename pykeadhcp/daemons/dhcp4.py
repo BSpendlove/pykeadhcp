@@ -569,7 +569,7 @@ class Dhcp4:
         Args:
             parameter:      Parameter to delete
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-del
@@ -589,7 +589,7 @@ class Dhcp4:
         Args:
             parameter:      Parameter to delete
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-get
@@ -608,7 +608,7 @@ class Dhcp4:
 
         Args:
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-get-all
@@ -628,7 +628,7 @@ class Dhcp4:
         Args:
             parameters:     Dictionary of parameters (key) and their config (values)
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-set
@@ -653,7 +653,7 @@ class Dhcp4:
             option_code:    Option Code
             option_space:   Option Space
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def4-del
@@ -681,7 +681,7 @@ class Dhcp4:
             option_code:    Option Code
             option_space:   Option Space
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def4-get
@@ -701,7 +701,7 @@ class Dhcp4:
 
         Args:
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def4-get-all
@@ -724,7 +724,7 @@ class Dhcp4:
         Args:
             option_def:     OptionDef Object
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option-def4-set
@@ -756,7 +756,7 @@ class Dhcp4:
             option_code:    Option Code
             option_space:   Option Space
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-global-del
@@ -784,7 +784,7 @@ class Dhcp4:
             option_code:    Option Code
             option_space:   Option Space
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-global-get
@@ -808,7 +808,7 @@ class Dhcp4:
 
         Args:
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-global-get-all
@@ -831,9 +831,9 @@ class Dhcp4:
         """Creates/Replaces a DHCPv4 option defined in the configuration database
 
         Args:
-            option_def:     OptionDef Object
+            option_data:    OptionData Object
             server_tag:     Single Server Tag
-            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
         Kea API Reference:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-global-set
@@ -852,23 +852,162 @@ class Dhcp4:
             remote_map=remote_map,
         )
 
-    def remote_option4_network_del(self):
-        pass
+    def remote_option4_network_del(
+        self,
+        shared_network: str,
+        option_code: int,
+        option_space: str,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv4 option from a shared network in the configuration database
 
-    def remote_option4_network_set(self):
-        pass
+        Args:
+            shared_network:     Name of shared network
+            option_code:        Option Code
+            option_space:       Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option4_pool_del(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-network-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-network-del",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": shared_network}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
 
-    def remote_option4_pool_set(self):
-        pass
+    def remote_option4_network_set(
+        self,
+        shared_network: str,
+        option_data: OptionData,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Delete a DHCPv4 option from a shared network in the configuration database
 
-    def remote_option4_subnet_del(self):
-        pass
+        Args:
+            shared_network:     Name of shared network
+            option_data:        OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def remote_option4_subnet_set(self):
-        pass
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-network-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-network-set",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": shared_network}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option4_pool_del(
+        self, pool: str, option_code: int, option_space: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a DHCPv4 option from an address pool in the configuration database
+
+        Args:
+            pool:           Pool Range
+            option_code:    Option Code
+            option_space:   Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-pool-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-pool-del",
+            service=self.service,
+            arguments={
+                "pools": [{"pool": pool}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option4_pool_set(
+        self, pool: str, option_data: OptionData, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv4 option in an address pool in the configuration database
+
+        Args:
+            pool:           Pool Range
+            option_data:    OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-pool-set
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-pool-set",
+            service=self.service,
+            arguments={
+                "pools": [{"pool": pool}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option4_subnet_del(
+        self, subnet_id: int, option_code: int, option_space: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a DHCPv4 option from a subnet in the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            option_code:    Option Code
+            option_space:   Option Space
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-option4-subnet-del
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-subnet-del",
+            service=self.service,
+            arguments={
+                "subnets": [{"id": subnet_id}],
+                "options": [{"code": option_code, "space": option_space}],
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_option4_subnet_set(
+        self, subnet_id: int, option_data: OptionData, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv4 option in a subnet in the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            option_data:    OptionData Object
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        return self.api.send_command_remote(
+            command="remote-option4-subnet-set",
+            service=self.service,
+            arguments={
+                "subnets": [{"id": subnet_id}],
+                "options": [
+                    option_data.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ],
+            },
+            remote_map=remote_map,
+        )
 
     def remote_network4_del(
         self, name: str, keep_subnets: bool = True, remote_map: dict = {}
