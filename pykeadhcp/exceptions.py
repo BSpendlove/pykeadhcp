@@ -107,3 +107,9 @@ class KeaReservationNotFoundException(KeaException):
     def __init__(self, reservation_data: str):
         self.message = f"Reservation '{reservation_data}' not found"
         super().__init__(self.message)
+
+
+class KeaClientClassNotFoundException(KeaException):
+    def __init__(self, client_class: str):
+        self.message = f"Client Class '{client_class}' not found"
+        super().__init__(self.message)

@@ -81,6 +81,7 @@ RUN [ "${KEA_PREMIUM}" != "premium" ] || ( \
         isc-kea-premium-subnet-cmds=${KEA_VERSION} \
         isc-kea-premium-host-cmds=${KEA_VERSION} \
         isc-kea-premium-cb-cmds=${KEA_VERSION} \
+        isc-kea-premium-class-cmds=${KEA_VERSION} \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/ \
