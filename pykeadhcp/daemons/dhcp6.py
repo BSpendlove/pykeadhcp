@@ -481,6 +481,60 @@ class Dhcp6:
             required_hook="subnet_cmds",
         )
 
+    def remote_global_parameter6_del(self):
+        pass
+
+    def remote_global_parameter6_get(self):
+        pass
+
+    def remote_global_parameter6_get_all(self):
+        pass
+
+    def remote_global_parameter6_set(self):
+        pass
+
+    def remote_option_def6_del(self):
+        pass
+
+    def remote_option_def6_get(self):
+        pass
+
+    def remote_option_def6_get_all(self):
+        pass
+
+    def remote_option_def6_set(self):
+        pass
+
+    def remote_option6_global_del(self):
+        pass
+
+    def remote_option6_global_get(self):
+        pass
+
+    def remote_option6_global_get_all(self):
+        pass
+
+    def remote_option6_global_set(self):
+        pass
+
+    def remote_option6_network_del(self):
+        pass
+
+    def remote_option6_network_set(self):
+        pass
+
+    def remote_option6_pool_del(self):
+        pass
+
+    def remote_option6_pool_set(self):
+        pass
+
+    def remote_option6_subnet_del(self):
+        pass
+
+    def remote_option6_subnet_set(self):
+        pass
+
     def remote_network6_del(
         self, name: str, keep_subnets: bool = True, remote_map: dict = {}
     ) -> KeaResponse:

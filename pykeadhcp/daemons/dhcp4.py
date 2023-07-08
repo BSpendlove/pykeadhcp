@@ -559,6 +559,127 @@ class Dhcp4:
             required_hook="subnet_cmds",
         )
 
+    def remote_global_parameter4_del(
+        self, parameter: str, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a global DHCPv4 parameter from the configuration database
+
+        Args:
+            parameter:      Parameter to delete
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-del
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter4-del",
+            service=self.service,
+            arguments={"parameters": [parameter], "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_global_parameter4_get(
+        self, parameter: str, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Get a specific global parameter from the configuration database
+
+        Args:
+            parameter:      Parameter to delete
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-get
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter4-get",
+            service=self.service,
+            arguments={"parameters": [parameter], "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_global_parameter4_get_all(
+        self, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Gets all global parameter from the configuration database
+
+        Args:
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-get-all
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter4-get-all",
+            service=self.service,
+            arguments={"server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_global_parameter4_set(
+        self, parameters: dict, server_tag: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Creates/Updates one or more global parameters in the configuration database
+
+        Args:
+            parameters:     Dictionary of parameters (key) and their config (values)
+            server_tag:     Single Server Tag
+            remote_map:     remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-global-parameter4-set
+        """
+        return self.api.send_command_remote(
+            command="remote-global-parameter4-set",
+            service=self.service,
+            arguments={"parameters": parameters, "server-tags": [server_tag]},
+            remote_map=remote_map,
+        )
+
+    def remote_option_def4_del(self):
+        pass
+
+    def remote_option_def4_get(self):
+        pass
+
+    def remote_option_def4_get_all(self):
+        pass
+
+    def remote_option_def4_set(self):
+        pass
+
+    def remote_option4_global_del(self):
+        pass
+
+    def remote_option4_global_get(self):
+        pass
+
+    def remote_option4_global_get_all(self):
+        pass
+
+    def remote_option4_global_set(self):
+        pass
+
+    def remote_option4_network_del(self):
+        pass
+
+    def remote_option4_network_set(self):
+        pass
+
+    def remote_option4_pool_del(self):
+        pass
+
+    def remote_option4_pool_set(self):
+        pass
+
+    def remote_option4_subnet_del(self):
+        pass
+
+    def remote_option4_subnet_set(self):
+        pass
+
     def remote_network4_del(
         self, name: str, keep_subnets: bool = True, remote_map: dict = {}
     ) -> KeaResponse:
