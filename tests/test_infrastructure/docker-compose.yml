@@ -1,7 +1,12 @@
 version: '3.7'
 services:
   kea:
-    build: .
+    build:
+      context: .
+      args:
+        KEA_VERSION: ${KEA_VERSION}
+        KEA_REPO: ${KEA_REPO}
+        KEA_PREMIUM: ${KEA_PREMIUM}
     ports:
       - "8080:8080" # Supervisor API Access
       - "8000:8000" # Ctrl Agent Daemon
@@ -11,6 +16,7 @@ services:
     environment:
       KEA_VERSION: "2.2.0-isc20220726061131"
       KEA_REPO: "public/isc/kea-2-2"
+      KEA_PREMIUM: ""
     volumes:
       - ./configs/supervisor/supervisord.conf:/etc/supervisor/supervisord.conf:Z
       - ./configs/supervisor/conf.d/:/etc/supervisor/conf.d:Z
