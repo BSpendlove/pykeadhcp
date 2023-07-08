@@ -93,3 +93,17 @@ class KeaConfigBackendNotConfiguredException(KeaException):
     def __init__(self):
         self.message = "Kea API reports that there is no configuration backends"
         super().__init__(self.message)
+
+
+class KeaUnknownHostReservationTypeException(KeaException):
+    def __init__(self, reservation_type: str):
+        self.message = (
+            f"Reservation type '{reservation_type}' is not a valid reservation type"
+        )
+        super().__init__(self.message)
+
+
+class KeaReservationNotFoundException(KeaException):
+    def __init__(self, reservation_data: str):
+        self.message = f"Reservation '{reservation_data}' not found"
+        super().__init__(self.message)

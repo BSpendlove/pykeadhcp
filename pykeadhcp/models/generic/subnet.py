@@ -10,4 +10,3 @@ class Subnet(CommonDHCPParams):
     subnet: str
     hostname_char_set: Optional[str]
     hostname_char_replacement: Optional[str]
-    shared_network_name: Optional[str]  # Used for cb_cmd hook

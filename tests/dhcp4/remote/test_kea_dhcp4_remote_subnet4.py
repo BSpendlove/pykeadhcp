@@ -21,7 +21,7 @@ def test_kea_dhcp4_remote_subnet4_get_non_existent(kea_server: Kea):
 
 
 def test_kea_dhcp4_remote_subnet4_add_subnet(kea_server: Kea):
-    subnet = Subnet4(subnet="192.0.2.32/31", id=40123, shared_network_name=None)
+    subnet = Subnet4(subnet="192.0.2.32/31", id=40123)
 
     # Create subnet
     response = kea_server.dhcp4.remote_subnet4_set(subnet=subnet, server_tags=["all"])
