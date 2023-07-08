@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from pykeadhcp import Kea
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
+from pykeadhcp.models.generic.remote_server import RemoteServer
 from pykeadhcp.models.dhcp6.lease import Lease6, Lease6Page, Lease6TypeEnum
 from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
@@ -13,6 +14,8 @@ from pykeadhcp.exceptions import (
     KeaSharedNetworkNotFoundException,
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
+    KeaConfigBackendNotConfiguredException,
+    KeaRemoteServerNotFoundException,
 )
 
 
@@ -55,6 +58,21 @@ class Dhcp6:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-build-report
         """
         return self.api.send_command(command="build-report", service=self.service)
+
+    def config_backend_pull(self) -> KeaResponse:
+        """Forces an immediate update of the servers using the configuration database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#config-backend-pull
+        """
+        data = self.api.send_command(
+            command="config-backend-pull", service=self.service
+        )
+
+        if data.result == 3:
+            raise KeaConfigBackendNotConfiguredException
+
+        return data
 
     def config_get(self) -> KeaResponse:
         """Retrieves the current configuration used by the server
@@ -457,6 +475,104 @@ class Dhcp6:
             service=self.service,
             arguments={"name": name, "id": subnet_id},
             required_hook="subnet_cmds",
+        )
+
+    def remote_server6_del(self, servers: List[str], remote_map: dict = {}):
+        """Delete information about a selected DHCP server from the configuration database
+
+        Args:
+            servers:    List of servers to delete
+            remote_map: (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server6-del
+        """
+        servers = [RemoteServer(server_tag=server) for server in servers]
+
+        return self.api.send_command_remote(
+            command="remote-server6-del",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+                for server in servers
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_server6_get(self, server_tag: str, remote_map: dict = {}):
+        """Get information about a specific DHCP server from the configuration database
+
+        Args:
+            server_tag:     Server tag to get
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server6-get
+
+        """
+        server = RemoteServer(server_tag=server_tag)
+        data = self.api.send_command_remote(
+            command="remote-server6-get",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+            },
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaRemoteServerNotFoundException(server_tag)
+
+        if not data.arguments["servers"]:
+            return None
+
+        remote_server = data.arguments["servers"][0]
+        return RemoteServer.parse_obj(remote_server)
+
+    def remote_server6_get_all(self, remote_map: dict = {}) -> KeaResponse:
+        """Fetches all user-defined DHCPv6 servers from the database
+
+        Args:
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-remote-server6-get-all
+        """
+        data = self.api.send_command_remote(
+            command="remote-server6-get-all",
+            service=self.service,
+            remote_map=remote_map,
+        )
+
+        return [
+            RemoteServer.parse_obj(server) for server in data.arguments.get("servers")
+        ]
+
+    def remote_server6_set(self, servers: List[RemoteServer], remote_map: dict = {}):
+        """Creates or replaces information about a DHCP server in the database
+
+        Args:
+            servers:        List of Servers to set
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server6-set
+
+        """
+        return self.api.send_command_remote(
+            command="remote-server6-set",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+                for server in servers
+            },
+            remote_map=remote_map,
         )
 
     def shutdown(self) -> KeaResponse:

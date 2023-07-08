@@ -57,6 +57,13 @@ def pytest_addoption(parser):
         help="Database Host to set in the remote_map to all API calls starting with 'remote'",
         default="db",
     )
+    parser.addoption(
+        "--raise-generic-errors",
+        action="store_true",
+        dest="raise_generic_errors",
+        default=False,
+        help="Raise Generic Kea Errors (useful for catching errors when developing)",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -65,10 +72,14 @@ def kea_server(request: FixtureRequest):
     port = request.config.getoption("port", default=8000)
     disable_ssl_verify = request.config.getoption("disable_ssl_verify", default=False)
     ssl_ca_bundle = request.config.getoption("ssl_ca_bundle", default=None)
+    raise_generic_errors = request.config.getoption(
+        "raise_generic_errors", default=False
+    )
 
     return Kea(
         host=host,
         port=port,
+        raise_generic_errors=raise_generic_errors,
         verify=False
         if disable_ssl_verify
         else True
