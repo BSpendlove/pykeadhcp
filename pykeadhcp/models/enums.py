@@ -81,3 +81,8 @@ class ServerIdTypeEnum(str, Enum):
 
 class AuthenticationTypeEnum(str, Enum):
     basic = "basic"
+
+
+class RemoteMapTypeEnum(str, Enum):
+    mysql = "mysql"
+    postgresql = "postgresql"

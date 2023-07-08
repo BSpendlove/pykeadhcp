@@ -41,6 +41,22 @@ def pytest_addoption(parser):
         help="CA Bundle if required to pass into requests module",
         default=None,
     )
+    parser.addoption(
+        "--db-type",
+        action="store",
+        dest="db_type",
+        type=str,
+        help="Database Type to set in the remote_map to all API calls starting with 'remote'",
+        default="mysql",
+    )
+    parser.addoption(
+        "--db-host",
+        action="store",
+        dest="db_host",
+        type=str,
+        help="Database Host to set in the remote_map to all API calls starting with 'remote'",
+        default="db",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -110,3 +126,11 @@ def ctrlagent_parser(request: FixtureRequest):
     data = read_local_config(filename="tests/configs/ctrlagent_api_config.json")
     assert data["Control-agent"]
     return CtrlAgentParser(config=data)
+
+
+@pytest.fixture(scope="module")
+def db_remote_map(request: FixtureRequest):
+    return {
+        "type": request.config.getoption("db_type"),
+        "host": request.config.getoption("db_host"),
+    }

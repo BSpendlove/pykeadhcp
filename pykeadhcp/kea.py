@@ -3,10 +3,12 @@ from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
 from pathlib import Path
 from typing import List, Union
+from pydantic import ValidationError
 
 from pykeadhcp.daemons import CtrlAgent, Ddns, Dhcp4, Dhcp6
 from pykeadhcp.models.generic import KeaResponse
 from pykeadhcp.models.generic.hook import Hook
+from pykeadhcp.models.generic.remote_map import RemoteMap
 from pykeadhcp.exceptions import (
     KeaGenericException,
     KeaCommandNotSupportedException,
@@ -14,6 +16,7 @@ from pykeadhcp.exceptions import (
     KeaServerConflictException,
     KeaUnauthorizedAccessException,
     KeaHookLibraryNotConfiguredException,
+    KeaInvalidRemoteMapException,
 )
 
 
@@ -195,6 +198,53 @@ class Kea:
             required_hook, self.hook_library[service]
         ):
             raise KeaHookLibraryNotConfiguredException(service, required_hook)
+
+        command_results = self.post(
+            endpoint="/",
+            body={
+                "command": command,
+                "service": [service] if service else [],
+                "arguments": arguments,
+            },
+        )
+        return command_results
+
+    def send_command_remote(
+        self, command: str, service: str, arguments: dict = {}, remote_map: dict = {}
+    ):
+        """Sends a command to the specific API daemon with provided arguments and remote map settings
+
+        This command should only be used with the cb_cmds hook.
+
+        Args:
+            command:        Supported command by the daemons API
+            service:        Service to send request to
+            arguments:      Argument parameters to pass to the command/service
+            required_hook:  Precheck if hook library is enabled
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        if service and service.lower() not in self.services:
+            raise TypeError(
+                f"Service {service} is not a supported service. The supported services are {self.services}"
+            )
+
+        # All remote commands require cb_cmds hook to be loaded
+        if not self.is_hook_enabled("cb_cmds", self.hook_library[service]):
+            raise KeaHookLibraryNotConfiguredException(service, "cb_cmds")
+
+        # Build remote payload if user wants to select a specific database instance as per API documentation
+        # https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-structure
+        if remote_map:
+            try:
+                remote_map_parsed = RemoteMap.parse_obj(remote_map)
+            except ValidationError as err:
+                raise KeaInvalidRemoteMapException(str(err))
+            except Exception as err:
+                raise KeaInvalidRemoteMapException(f"Generic Exception caught: {err}")
+
+            arguments["remote"] = remote_map_parsed.dict(
+                exclude_unset=True, exclude_none=True
+            )
 
         command_results = self.post(
             endpoint="/",

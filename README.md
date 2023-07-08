@@ -127,6 +127,24 @@ server.dhcp4.refresh_cached_config()
 
 For API calls that don't amend the configuration (eg. lease4-add, lease6-add, config-get, etc....), there is no need to refresh the relevant daemon configuration. Maybe I will add a feature in the future to allow the user to specify if they want the cached_config to be automatically refreshed when a function is called that requires a refresh but for now its manual.
 
+## Configuration Backend (cb_cmds hook)
+
+Majority if not all `remote-` commands which interact with the configuration backend implement the `remote_map` variable which allows you to specify the database instance you want to [interact with as per documentation here](https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-structure). It accepts the following variables inside the dictionary:
+
+```
+{
+    "type": "<mysql | postgresql>",
+    "host": "<ip address>",
+    "port": <port>
+}
+
+For example:
+
+kea_server.dhcp4.remote_subnet4_set(subnet=subnet, server_tags=["all"], remote_map={"type": "mysql"})
+
+Note that the remote_map is optional and not mandatory.
+```
+
 ## Parsers
 
 Majority of the useful API functionality requires a subscription for the premium hooks to use API commands like `subnet4-add` or `network6-add` as an example. This is typically the recommended way to interact with Kea as there is some additional validation that the API will perform and potentially prevent misconfiguration of your daemons (Dhcp4, Dhcp6, Control Agent, DDNS) that pykeadhcp may not correctly implement.
