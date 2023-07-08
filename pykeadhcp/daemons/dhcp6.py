@@ -575,6 +575,155 @@ class Dhcp6:
             remote_map=remote_map,
         )
 
+    def remote_subnet6_del_by_id(
+        self, subnet_id: int, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a subnet from the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet6-del-by-id
+        """
+        return self.api.send_command_remote(
+            command="remote-subnet6-del-by-id",
+            service=self.service,
+            arguments={"subnets": [{"id": subnet_id}]},
+            remote_map=remote_map,
+        )
+
+    def remote_subnet6_del_by_prefix(
+        self, prefix: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a subnet from the configuration database
+
+        Args:
+            prefix:         Subnet Prefix
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        return self.api.send_command_remote(
+            command="remote-subnet6-del-by-prefix",
+            service=self.service,
+            arguments={"subnets": [{"subnet": prefix}]},
+            remote_map=remote_map,
+        )
+
+    def remote_subnet6_get_by_id(
+        self, subnet_id: int, remote_map: dict = {}
+    ) -> Subnet6:
+        """Gets a Subnet based on id from the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet6-get-by-id
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet6-get-by-id",
+            service=self.service,
+            arguments={"subnets": [{"id": subnet_id}]},
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(subnet_id)
+
+        if not data.arguments.get("subnets"):
+            return None
+
+        subnet = data.arguments["subnets"][0]
+        return Subnet6.parse_obj(subnet)
+
+    def remote_subnet6_get_by_prefix(
+        self, prefix: str, remote_map: dict = {}
+    ) -> Subnet6:
+        """Gets a Subnet based on subnet CIDR from the configuration database
+
+        Args:
+            prefix:         Subnet CIDR
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet6-get-by-prefix
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet6-get-by-prefix",
+            service=self.service,
+            arguments={"subnets": [{"subnet": prefix}]},
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(prefix)
+
+        if not data.arguments.get("subnets"):
+            return None
+
+        subnet = data.arguments["subnets"][0]
+        return Subnet6.parse_obj(subnet)
+
+    def remote_subnet6_list(
+        self, server_tags: List[str], remote_map: dict = {}
+    ) -> List[Subnet6]:
+        """List all currently configured subnets in the configuration database
+
+        Args:
+            server_tags:    List of server tags (at least 1 one must be present)
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet6-list
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet6-list",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        subnets = [Subnet6.parse_obj(subnet) for subnet in data.arguments["subnets"]]
+        return subnets
+
+    def remote_subnet6_set(
+        self,
+        subnet: Subnet6,
+        server_tags: List[str],
+        shared_network_name: str = None,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Creates or replaces a subnet in the configuration database
+
+        shared_network:     Name of shared-network (if global subnet, use None)
+        subnets:            List of Subnets to configure under shared-network
+        server_tags:        List of server tags (at least 1 one must be present)
+        remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet6-set
+
+        """
+        data = subnet.dict(
+            exclude_none=True,
+            exclude_unset=True,
+            by_alias=True,
+        )
+
+        data["shared-network-name"] = shared_network_name
+
+        return self.api.send_command_remote(
+            command="remote-subnet6-set",
+            service=self.service,
+            arguments={
+                "subnets": [data],
+                "server-tags": server_tags,
+            },
+            remote_map=remote_map,
+        )
+
     def shutdown(self) -> KeaResponse:
         """Instructs the server daemon to initiate its shutdown procedure
 
