@@ -4,13 +4,21 @@ if TYPE_CHECKING:
     from pykeadhcp import Kea
 
 from pykeadhcp.models.generic import KeaResponse, StatusGet
+from pykeadhcp.models.generic.remote_server import RemoteServer
 from pykeadhcp.models.dhcp4.shared_network import SharedNetwork4
 from pykeadhcp.models.dhcp4.subnet import Subnet4
 from pykeadhcp.models.dhcp4.lease import Lease4, Lease4Page
+from pykeadhcp.models.dhcp4.reservation import Reservation4
+from pykeadhcp.models.enums import HostReservationIdentifierEnum
 from pykeadhcp.exceptions import (
+    KeaException,
     KeaSharedNetworkNotFoundException,
     KeaSubnetNotFoundException,
     KeaLeaseNotFoundException,
+    KeaRemoteServerNotFoundException,
+    KeaConfigBackendNotConfiguredException,
+    KeaUnknownHostReservationTypeException,
+    KeaReservationNotFoundException,
 )
 
 
@@ -53,6 +61,21 @@ class Dhcp4:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-build-report
         """
         return self.api.send_command(command="build-report", service=self.service)
+
+    def config_backend_pull(self) -> KeaResponse:
+        """Forces an immediate update of the servers using the configuration database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#config-backend-pull
+        """
+        data = self.api.send_command(
+            command="config-backend-pull", service=self.service
+        )
+
+        if data.result == 3:
+            raise KeaConfigBackendNotConfiguredException
+
+        return data
 
     def config_get(self) -> KeaResponse:
         """Retrieves the current configuration used by the server
@@ -536,26 +559,592 @@ class Dhcp4:
             required_hook="subnet_cmds",
         )
 
-    def reservation_add(self) -> KeaResponse:
-        raise NotImplementedError
+    def remote_network4_del(
+        self, name: str, keep_subnets: bool = True, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes an existing Shared Network from the configuration database
 
-    def reservation_del(self) -> KeaResponse:
-        raise NotImplementedError
+        Args:
+            name:           Name of shared network
+            keep_subnets:   Keeps any existing subnets if True
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def reservation_get(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network4-del
+        """
+        return self.api.send_command_remote(
+            command="remote-network4-del",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": name}],
+                "subnets-action": "keep" if keep_subnets else "delete",
+            },
+            remote_map=remote_map,
+        )
 
-    def reservation_get_all(self) -> KeaResponse:
-        raise NotImplementedError
+    def remote_network4_get(
+        self, name: str, include_subnets: bool = True, remote_map: dict = {}
+    ) -> SharedNetwork4:
+        """Returns detailed information about a shared network, including subnets
 
-    def reservation_get_by_hostname(self) -> KeaResponse:
-        raise NotImplementedError
+        Args:
+            name:               Name of shared network
+            include_subnets:    Include detailed information about subnets
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
 
-    def reservation_get_by_id(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network4-get
+        """
+        data = self.api.send_command_remote(
+            command="remote-network4-get",
+            service=self.service,
+            arguments={
+                "shared-networks": [{"name": name}],
+                "subnets-include": "full" if include_subnets else "no",
+            },
+            remote_map=remote_map,
+        )
 
-    def reservation_get_page(self) -> KeaResponse:
-        raise NotImplementedError
+        if data.result == 3:
+            raise KeaSharedNetworkNotFoundException(name)
+
+        if not data.arguments["shared-networks"]:
+            return None
+
+        shared_network = data.arguments["shared-networks"][0]
+        return SharedNetwork4.parse_obj(shared_network)
+
+    def remote_network4_list(
+        self, server_tags: List[str], remote_map: dict = {}
+    ) -> List[SharedNetwork4]:
+        """Gets all shared networks in the configuration database:
+
+        Args:
+            server_tags:        List of server tags (at least 1 one must be present)
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-network4-list
+        """
+        data = self.api.send_command_remote(
+            command="remote-network4-list",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        shared_networks = [
+            SharedNetwork4.parse_obj(shared_network)
+            for shared_network in data.arguments["shared-networks"]
+        ]
+        return shared_networks
+
+    def remote_network4_set(
+        self,
+        shared_networks: List[SharedNetwork4],
+        server_tags: List[str],
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Adds or replaces shared-network configuration in the configuration database
+
+        Args:
+            shared_networks:    List of shared networks to add
+            server_tags:        List of server tags (at least 1 one must be present)
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+
+        # Shared networks must not contain subnets in this API call
+        for shared_network in shared_networks:
+            if shared_network.subnet4:
+                raise KeaException(
+                    message=f"Shared Network {shared_network.name} contains a list of 1 or more subnets. Please refer to documentation on how to use this command."
+                )
+
+        return self.api.send_command_remote(
+            command="remote-network4-set",
+            service=self.service,
+            arguments={
+                "shared-networks": [
+                    network.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                    for network in shared_networks
+                ],
+                "server-tags": server_tags,
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_server4_del(self, servers: List[str], remote_map: dict = {}):
+        """Delete information about a selected DHCP server from the configuration database
+
+        Args:
+            servers:    List of servers to delete
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server4-del
+        """
+        servers = [RemoteServer(server_tag=server) for server in servers]
+
+        return self.api.send_command_remote(
+            command="remote-server4-del",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+                for server in servers
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_server4_get(self, server_tag: str, remote_map: dict = {}):
+        """Get information about a specific DHCP server from the configuration database
+
+        Args:
+            server_tag:     Server tag to get
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server4-get
+
+        """
+        server = RemoteServer(server_tag=server_tag)
+        data = self.api.send_command_remote(
+            command="remote-server4-get",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+            },
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaRemoteServerNotFoundException(server_tag)
+
+        if not data.arguments["servers"]:
+            return None
+
+        remote_server = data.arguments["servers"][0]
+        return RemoteServer.parse_obj(remote_server)
+
+    def remote_server4_get_all(self, remote_map: dict = {}) -> KeaResponse:
+        """Fetches all user-defined DHCPv4 servers from the database
+
+        Args:
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-remote-server4-get-all
+        """
+        data = self.api.send_command_remote(
+            command="remote-server4-get-all",
+            service=self.service,
+            remote_map=remote_map,
+        )
+
+        return [
+            RemoteServer.parse_obj(server) for server in data.arguments.get("servers")
+        ]
+
+    def remote_server4_set(self, servers: List[RemoteServer], remote_map: dict = {}):
+        """Creates or replaces information about a DHCP server in the database
+
+        Args:
+            servers:        List of Servers to set
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-server4-set
+
+        """
+        return self.api.send_command_remote(
+            command="remote-server4-set",
+            service=self.service,
+            arguments={
+                "servers": [
+                    server.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+                ]
+                for server in servers
+            },
+            remote_map=remote_map,
+        )
+
+    def remote_subnet4_del_by_id(
+        self, subnet_id: int, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a subnet from the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet4-del-by-id
+        """
+        return self.api.send_command_remote(
+            command="remote-subnet4-del-by-id",
+            service=self.service,
+            arguments={"subnets": [{"id": subnet_id}]},
+            remote_map=remote_map,
+        )
+
+    def remote_subnet4_del_by_prefix(
+        self, prefix: str, remote_map: dict = {}
+    ) -> KeaResponse:
+        """Deletes a subnet from the configuration database
+
+        Args:
+            prefix:         Subnet Prefix
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+        """
+        return self.api.send_command_remote(
+            command="remote-subnet4-del-by-prefix",
+            service=self.service,
+            arguments={"subnets": [{"subnet": prefix}]},
+            remote_map=remote_map,
+        )
+
+    def remote_subnet4_get_by_id(
+        self, subnet_id: int, remote_map: dict = {}
+    ) -> Subnet4:
+        """Gets a Subnet based on id from the configuration database
+
+        Args:
+            subnet_id:      Subnet ID
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet4-get-by-id
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet4-get-by-id",
+            service=self.service,
+            arguments={"subnets": [{"id": subnet_id}]},
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(subnet_id)
+
+        if not data.arguments.get("subnets"):
+            return None
+
+        subnet = data.arguments["subnets"][0]
+        return Subnet4.parse_obj(subnet)
+
+    def remote_subnet4_get_by_prefix(
+        self, prefix: str, remote_map: dict = {}
+    ) -> Subnet4:
+        """Gets a Subnet based on subnet CIDR from the configuration database
+
+        Args:
+            prefix:         Subnet CIDR
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet4-get-by-prefix
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet4-get-by-prefix",
+            service=self.service,
+            arguments={"subnets": [{"subnet": prefix}]},
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaSubnetNotFoundException(prefix)
+
+        if not data.arguments.get("subnets"):
+            return None
+
+        subnet = data.arguments["subnets"][0]
+        return Subnet4.parse_obj(subnet)
+
+    def remote_subnet4_list(
+        self, server_tags: List[str], remote_map: dict = {}
+    ) -> List[Subnet4]:
+        """List all currently configured subnets in the configuration database
+
+        Args:
+            server_tags:    List of server tags (at least 1 one must be present)
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet4-list
+        """
+        data = self.api.send_command_remote(
+            command="remote-subnet4-list",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        subnets = [Subnet4.parse_obj(subnet) for subnet in data.arguments["subnets"]]
+        return subnets
+
+    def remote_subnet4_set(
+        self,
+        subnet: Subnet4,
+        server_tags: List[str],
+        shared_network_name: str = None,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Creates or replaces a subnet in the configuration database
+
+        shared_network:     Name of shared-network (if global subnet, use None)
+        subnets:            List of Subnets to configure under shared-network
+        server_tags:        List of server tags (at least 1 one must be present)
+        remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-subnet4-set
+
+        """
+        data = subnet.dict(
+            exclude_none=True,
+            exclude_unset=True,
+            by_alias=True,
+        )
+
+        data["shared-network-name"] = shared_network_name
+
+        return self.api.send_command_remote(
+            command="remote-subnet4-set",
+            service=self.service,
+            arguments={
+                "subnets": [data],
+                "server-tags": server_tags,
+            },
+            remote_map=remote_map,
+        )
+
+    def reservation_add(self, ip_address: str, **kwargs) -> KeaResponse:
+        """Creates a new host reservation
+
+        Args:
+            reservation:        Reservation Object
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-add
+        """
+        reservation = Reservation4(ip_address=ip_address, **kwargs)
+
+        return self.api.send_command_with_arguments(
+            command="reservation-add",
+            service=self.service,
+            arguments={
+                "reservation": reservation.dict(
+                    exclude_none=True, exclude_unset=True, by_alias=True
+                )
+            },
+            required_hook="host_cmds",
+        )
+
+    def reservation_del_by_ip(self, ip_address: str, subnet_id: int) -> KeaResponse:
+        """Delete a reservation in the host database based on IP and subnet ID
+
+        Args:
+            ip_address:     IP address of the reservation
+            subnet_id:      Subnet ID reservation belongs to
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-del
+        """
+        return self.api.send_command_with_arguments(
+            command="reservation-del",
+            service=self.service,
+            arguments={"subnet-id": subnet_id, "ip-address": ip_address},
+            required_hook="host_cmds",
+        )
+
+    def reservation_del_by_identifier(
+        self,
+        subnet_id: int,
+        identifier_type: HostReservationIdentifierEnum,
+        identifier: str,
+    ) -> KeaResponse:
+        """Delete a reservation in the host database based on IP and subnet ID
+
+        Args:
+            subnet_id:          Subnet ID reservation belongs to
+            identifier_type:    Identifier Type
+            identifier:         Identifier Data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-del
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException
+
+        return self.api.send_command_with_arguments(
+            command="reservation-del",
+            service=self.service,
+            arguments={
+                "subnet-id": subnet_id,
+                "identifier-type": identifier_type,
+                "identifier": identifier,
+            },
+            required_hook="host_cmds",
+        )
+
+    def reservation_get_by_ip_address(
+        self, subnet_id: int, ip_address: str
+    ) -> Reservation4:
+        """Gets an existing host reservation
+
+        Args:
+            ip_address:     IP address of the reservation
+            subnet_id:      Subnet ID reservation belongs to
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get
+        """
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get",
+            service=self.service,
+            arguments={"subnet-id": subnet_id, "ip-address": ip_address},
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(reservation_data=ip_address)
+
+        return Reservation4.parse_obj(data.arguments)
+
+    def reservation_get_by_identifier(
+        self,
+        subnet_id: int,
+        identifier_type: HostReservationIdentifierEnum,
+        identifier: str,
+    ) -> Reservation4:
+        """Gets an existing host reservation
+
+        Args:
+            subnet_id:          Subnet ID
+            identifier_type:    Identifier Type
+            identifier:         Identifier Data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get",
+            service=self.service,
+            arguments={
+                "subnet-id": subnet_id,
+                "identifier-type": identifier_type,
+                "identifier": identifier,
+            },
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(
+                reservation_data=f"({identifier_type}) {identifier}"
+            )
+
+        return Reservation4.parse_obj(data.arguments)
+
+    def reservation_get_all(self, subnet_id: int) -> KeaResponse:
+        """Gets all host reservations for a given subnet id
+
+        Args:
+            subnet_id:      Subnet ID
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-all
+        """
+        reservations = self.api.send_command_with_arguments(
+            command="reservation-get-all",
+            service=self.service,
+            arguments={"subnet-id": subnet_id},
+            required_hook="host_cmds",
+        )
+
+        return [
+            Reservation4.parse_obj(reservation)
+            for reservation in reservations.arguments.get("hosts")
+        ]
+
+    def reservation_get_by_hostname(
+        self, hostname: str, subnet_id: int
+    ) -> Reservation4:
+        """Gets a reservation based on a hostname
+
+        Args:
+            hostname:       Reservation Hostname
+            subnet_id:      Subnet ID
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-by-hostname
+        """
+        data = self.api.send_command_with_arguments(
+            command="reservation-get-by-hostname",
+            service=self.service,
+            arguments={"hostname": hostname, "subnet-id": subnet_id},
+            required_hook="host_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaReservationNotFoundException(
+                reservation_data=f"(hostname) {hostname}"
+            )
+
+        if not data.arguments.get("hosts"):
+            return None
+
+        return Reservation4.parse_obj(data.arguments["hosts"][0])
+
+    def reservation_get_page(
+        self,
+        subnet_id: int = None,
+        limit: int = 1000,
+        source_index: int = 0,
+        from_host_id: int = 0,
+    ) -> List[Reservation4]:
+        """Gathers all host reservations with paging functionality
+
+        Args:
+            subnet_id:      Subnet ID to filter if provided
+            limit:          Limit reservations to return
+            source_index:   Refer to https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-reservation-get-page
+            from_host_id:   Refer to https://kea.readthedocs.io/en/kea-2.2.0/arm/hooks.html#command-reservation-get-page
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#reservation-get-page
+        """
+        params = {"limit": limit, "source-index": source_index, "from": from_host_id}
+
+        if subnet_id:
+            params["subnet-id"] = subnet_id
+
+        data = self.api.send_command_with_arguments(
+            command="reservation-get-page",
+            service=self.service,
+            arguments=params,
+            required_hook="host_cmds",
+        )
+
+        if data.result == 1:
+            raise KeaException(message=data.text)
+
+        if not data.arguments or not data.arguments.get("hosts"):
+            return None
+
+        return [
+            Reservation4.parse_obj(reservation)
+            for reservation in data.arguments["hosts"]
+        ]
 
     def server_tag_get(self) -> KeaResponse:
         pass

@@ -7,8 +7,8 @@ from pykeadhcp.models.enums import LoggerLevelEnum
 class Output(KeaBaseModel):
     output: str
     flush: bool
-    maxsize: int
-    maxver: int
+    maxsize: Optional[int]
+    maxver: Optional[int]
     pattern: Optional[str]
 
 

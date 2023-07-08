@@ -10,3 +10,4 @@ class Reservation(KeaModel):
     hw_address: Optional[str]
     hostname: Optional[str]
     option_data: Optional[List[OptionData]] = []
+    subnet_id: Optional[int]  # Used for reservation-add
