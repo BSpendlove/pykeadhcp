@@ -12,6 +12,7 @@ from pykeadhcp.models.dhcp6.pd_pool import PDPool
 from pykeadhcp.models.dhcp6.reservation import Reservation6
 from pykeadhcp.models.dhcp6.shared_network import SharedNetwork6
 from pykeadhcp.models.dhcp6.subnet import Subnet6
+from pykeadhcp.models.dhcp6.client_class import ClientClass6
 from pykeadhcp.models.enums import HostReservationIdentifierEnum
 from pykeadhcp.exceptions import (
     KeaException,
@@ -22,6 +23,7 @@ from pykeadhcp.exceptions import (
     KeaRemoteServerNotFoundException,
     KeaUnknownHostReservationTypeException,
     KeaReservationNotFoundException,
+    KeaClientClassNotFoundException,
 )
 
 
@@ -64,6 +66,100 @@ class Dhcp6:
             https://kea.readthedocs.io/en/kea-2.2.0/api.html#ref-build-report
         """
         return self.api.send_command(command="build-report", service=self.service)
+
+    def class_add(self, client_class: ClientClass6) -> KeaResponse:
+        """Adds a new class to the existing server configuration
+
+        Args:
+            client_class:       ClientClass6 Object
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#class-add
+        """
+        return self.api.send_command_with_arguments(
+            command="class-add",
+            service=self.service,
+            arguments={
+                "client-classes": [
+                    client_class.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ]
+            },
+            required_hook="class_cmds",
+        )
+
+    def class_del(self, name: str) -> KeaResponse:
+        """Removes a client class from the server configuration
+
+        Args:
+            name:   Name of Class
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#class-del
+        """
+        return self.api.send_command_with_arguments(
+            command="class-del",
+            service=self.service,
+            arguments={"name": name},
+            required_hook="class_cmds",
+        )
+
+    def class_get(self, name: str) -> ClientClass6:
+        """Returns detailed information about an existing client class
+
+        Args:
+            name:   Name of Class
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#class-get
+        """
+        data = self.api.send_command_with_arguments(
+            command="class-get",
+            service=self.service,
+            arguments={"name": name},
+            required_hook="class_cmds",
+        )
+
+        if data.result == 3:
+            raise KeaClientClassNotFoundException(client_class=name)
+
+        if not data.arguments.get("client-classes"):
+            return None
+
+        client_class = data.arguments["client-classes"][0]
+        return ClientClass6.parse_obj(client_class)
+
+    def class_list(self) -> List[ClientClass6]:
+        """Retrieves a list of all client classes from server configuration
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#class-list
+        """
+        data = self.api.send_command(
+            command="class-list", service=self.service, required_hook="class_cmds"
+        )
+
+        client_classes = data.arguments.get("client-classes")
+        return [ClientClass6.parse_obj(client_class) for client_class in client_classes]
+
+    def class_update(self, client_class: ClientClass6) -> KeaResponse:
+        """Updates an existing client class in the server configuration
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#class-update
+        """
+        return self.api.send_command_with_arguments(
+            command="class-update",
+            service=self.service,
+            arguments={
+                "client-classes": [
+                    client_class.dict(
+                        exclude_none=True, exclude_unset=True, by_alias=True
+                    )
+                ]
+            },
+        )
 
     def config_backend_pull(self) -> KeaResponse:
         """Forces an immediate update of the servers using the configuration database
@@ -481,6 +577,99 @@ class Dhcp6:
             service=self.service,
             arguments={"name": name, "id": subnet_id},
             required_hook="subnet_cmds",
+        )
+
+    def remote_class6_del(self, name: str, remote_map: dict = {}) -> KeaResponse:
+        """Deletes a DHCPv6 client class from the configuration database
+
+        Args:
+            name:       Name of the client class
+            remote_map: (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-class6-del
+        """
+        return self.api.send_command_remote(
+            command="remote-class6-del",
+            service=self.service,
+            arguments={"client-classes": [{"name": name}]},
+            remote_map=remote_map,
+        )
+
+    def remote_class6_get(self, name: str, remote_map: dict = {}) -> ClientClass6:
+        """Gets a DHCPv6 client class from the configuration database
+
+        Args:
+            name:       Name of the client class
+            remote_map: (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-class6-get
+        """
+        data = self.api.send_command_remote(
+            command="remote-class6-get",
+            service=self.service,
+            arguments={"client-classes": [{"name": name}]},
+            remote_map=remote_map,
+        )
+
+        if data.result == 3:
+            raise KeaClientClassNotFoundException(client_class=name)
+
+        if not data.arguments.get("client-classes"):
+            return None
+
+        client_class = data.arguments["client-classes"][0]
+        return ClientClass6.parse_obj(client_class)
+
+    def remote_class6_get_all(
+        self, server_tags: List[str] = ["all"], remote_map: dict = {}
+    ) -> ClientClass6:
+        """Gets all DHCPv6 client classes from the configuration database
+
+        Args:
+            server_tags:    List of Server Tags
+            remote_map:     (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-class6-get-all
+        """
+        data = self.api.send_command_remote(
+            command="remote-class6-get-all",
+            service=self.service,
+            arguments={"server-tags": server_tags},
+            remote_map=remote_map,
+        )
+
+        client_classes = data.arguments.get("client-classes")
+        return [ClientClass6.parse_obj(client_class) for client_class in client_classes]
+
+    def remote_class6_set(
+        self,
+        client_class: ClientClass6,
+        server_tags: List[str] = ["all"],
+        follow_class_name: str = None,
+        remote_map: dict = {},
+    ) -> KeaResponse:
+        """Creates/Replaces a DHCPv6 Client Class in the configuration database
+
+        Args:
+            client_class:       ClientClass6 Object
+            follow_class_name:  Places client class after existing class in the hierarchy
+            remote_map:         (remote_type, remote_host or remote_port) to select a specific remote database
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#remote-class6-set
+        """
+        data = client_class.dict(exclude_none=True, exclude_unset=True, by_alias=True)
+        if follow_class_name:
+            data["follow-class-name"] = follow_class_name
+
+        return self.api.send_command_remote(
+            command="remote-class6-set",
+            service=self.service,
+            arguments={"client-classes": [data], "server-tags": server_tags},
+            remote_map=remote_map,
         )
 
     def remote_global_parameter6_del(
