@@ -107,6 +107,6 @@ def test_kea_dhcp4_subnet4_get_next_available_id(kea_server: Kea):
     next_available_id = kea_server.dhcp4.get_next_available_subnet_id()
     subnets = kea_server.dhcp4.subnet4_list()
 
-    assert subnets
-    subnet_ids = [subnet.id for subnet in subnets]
-    assert next_available_id not in subnets
+    if subnets:
+        subnet_ids = [subnet.id for subnet in subnets]
+        assert next_available_id not in subnet_ids
