@@ -67,6 +67,157 @@ class Dhcp6:
         """
         return self.api.send_command(command="build-report", service=self.service)
 
+    def cache_clear(self) -> KeaResponse:
+        """Removes all cached host reservations
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-clear
+        """
+        return self.api.send_command(
+            command="cache-clear", service=self.service, required_hook="host_cache"
+        )
+
+    def cache_flush(self, number: int) -> KeaResponse:
+        """Removes certain number of entries in the host cache
+
+        Args:
+            number:     Number of host caches to clear
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-flush
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-flush",
+            service=self.service,
+            arguments=number,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
+    def cache_get(self) -> List[Reservation6]:
+        """Gets full content of the host cache
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-get
+        """
+        data = self.api.send_command(
+            command="cache-get", service=self.service, required_hook="host_cache"
+        )
+
+        if data.result == 3:
+            return []
+
+        return [Reservation6.parse_obj(reservation) for reservation in data.arguments]
+
+    def cache_get_by_id(
+        self, identifier_type: HostReservationIdentifierEnum, identifier: str
+    ) -> List[Reservation6]:
+        """Returns entries matching the given identifier from the host cache
+
+        Args:
+            identifier_type:        Type of Identifier
+            identifier:             Identifier data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-get-by-id
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException(identifier_type)
+
+        data = self.api.send_command_with_arguments(
+            command="cache-get-by-id",
+            service=self.service,
+            arguments={identifier_type: identifier},
+            required_hook="host_cache",
+        )
+
+        if data.result == 3:
+            return []
+
+        return [Reservation6.parse_obj(reservation) for reservation in data.arguments]
+
+    def cache_insert(self, subnet_id: int, reservation: Reservation6) -> KeaResponse:
+        """Manually insert a host into the cache
+
+        Args:
+            reservation:    Reservation6 Object
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-insert
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-insert",
+            service=self.service,
+            arguments={
+                "subnet-id4": 0,
+                "subnet-id6": subnet_id,
+                **reservation.dict(
+                    exclude_none=True, exclude_unset=True, by_alias=True
+                ),
+            },
+            required_hook="host_cache",
+        )
+
+    def cache_load(self, filepath: str) -> KeaResponse:
+        """Instructs Kea to load from a previously dumped cache into its existing host cache
+
+        Args:
+            filepath:   File Path to load
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-load
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-load",
+            service=self.service,
+            arguments=filepath,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
+    def cache_remove(self, subnet_id: int, ip_address: str) -> KeaResponse:
+        """Remove an entry from the host cache
+
+        Args:
+            subnet_id:      Subnet ID
+            ip_address:     IP Address
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-remove
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-remove",
+            service=self.service,
+            arguments={"ip-address": ip_address, "subnet-id": subnet_id},
+            required_hook="host_cache",
+        )
+
+    def cache_size(self) -> KeaResponse:
+        """Returns the number of entries in the host cache
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-size
+        """
+        return self.api.send_command(
+            command="cache-size", service=self.service, required_hook="host_cache"
+        )
+
+    def cache_write(self, filepath: str) -> KeaResponse:
+        """Instructs Kea to write host cache content to disk
+
+        Args:
+            filepath:   File Path to save
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-write
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-write",
+            service=self.service,
+            arguments=filepath,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
     def class_add(self, client_class: ClientClass6) -> KeaResponse:
         """Adds a new class to the existing server configuration
 
