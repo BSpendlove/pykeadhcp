@@ -16,6 +16,8 @@ services:
       - 3306:3306
     volumes:
       - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      ha_backend:
 
   keaprimary:
     build:
@@ -41,6 +43,9 @@ services:
       - ./configs/ha/primary/kea-dhcp4-sql.conf:/etc/kea/kea-dhcp4.conf:Z
       - ./configs/ha/primary/kea-dhcp6-sql.conf:/etc/kea/kea-dhcp6.conf:Z
     tty: true
+    networks:
+      ha_backend:
+        ipv4_address: 192.0.2.150
 
   keastandby:
     build:
@@ -66,3 +71,14 @@ services:
       - ./configs/ha/standby/kea-dhcp4-sql.conf:/etc/kea/kea-dhcp4.conf:Z
       - ./configs/ha/standby/kea-dhcp6-sql.conf:/etc/kea/kea-dhcp6.conf:Z
     tty: true
+    networks:
+      ha_backend:
+        ipv4_address: 192.0.2.151
+
+networks:
+  ha_backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.0.2.128/25
+          gateway: 192.0.2.129

@@ -86,6 +86,7 @@ RUN [ "${KEA_PREMIUM}" != "premium" ] || ( \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/ \
+        && ldconfig \
         )
 
 ENTRYPOINT [ "/bin/sh", "-c", \
