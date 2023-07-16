@@ -15,12 +15,18 @@ def test_kea_dhcp6_config_get(kea_server: Kea):
 
 def test_kea_dhcp6_config_test(kea_server: Kea):
     config = kea_server.dhcp6.cached_config
+    if config.get("hash"):  # Temp workaround
+        del config["hash"]
+
     response = kea_server.dhcp6.config_test(config=config)
     assert response.result == 0
 
 
 def test_kea_dhcp6_config_set(kea_server: Kea):
     config = kea_server.dhcp6.cached_config
+    if config.get("hash"):  # Temp workaround
+        del config["hash"]
+
     response = kea_server.dhcp6.config_set(config=config)
     assert response.result == 0
 

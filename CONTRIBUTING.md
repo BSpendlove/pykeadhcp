@@ -22,6 +22,33 @@ You must adhere to the following formats for tests:
 1. All relevant tests must be placed in their respective file for that daemon (eg. dhcp4 tests must be placed inside `test_kea_dhcp4.py` test file)
 2. All functions must following the format of `test_kea_<daemon_name>_<API reference command>` where the `API reference command` follows the same name as the Kea API documentation, replacing special charaters (hypthens) and spaces with an underscore. For example if you are implementing the dhcp4 config-get API command, the function name must be `test_kea_dhcp4_config_get`.
 
+## Docker Test Infrastructure
+
+The docker infrastructure is still being worked on but for now, runs as expected from a fresh clone. The following docker compose files are provided:
+
+- docker-compose.yml
+   - Standalone instance of Kea with support for hooks if you fill out the environment variables discussed shortly.
+- docker-compose-sql.yml
+   - Standalone instance of Kea with a database backend (config + lease + host reservations) used to test mainly cb_config hooks.
+- docker-compose-ha-sql.yml
+   - Primary and Secondary Kea instances with a database backend (config + lease + host reservations) to test HA functionality.
+
+### HA Testing
+
+The `docker-compose-ha-sql.yml` file contains a separate network (192.0.2.128/25) with IP addresses configured directly under the kea services. The HA hook configuration parameters only takes IP addresses and not hostnames (for obvious reasons, it's always DNS... wouldn't want DHCP HA to depend on DNS resolution now would we?) therefore the hard-coded IP addresses should factor in any additional services configured on the network for testing purposes (hence why kea instances use IPs further in the /25 range).
+
+### Premium Hooks
+
+If you are developing or testing the premium hooks, create a file called `.env` in the tests/test_infrastructure folder with the following variables:
+
+```
+KEA_VERSION="<version-here"
+KEA_REPO="<private-token>/isc/kea-<version eg. 2-4>-prv"
+KEA_PREMIUM="premium"
+```
+
+Rebuild the container using `docker-compose up --build` and the hooks should install as required if your token is correct and has correct permissions to download via the private repository.
+
 ## Pull Request Process
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
