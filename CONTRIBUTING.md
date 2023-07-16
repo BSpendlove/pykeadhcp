@@ -1,5 +1,7 @@
 # Contributing
 
+NOTE: as of July 2023, the Dockerfile will fail for Kea versions `<2.4.0` so you should ensure any development is tested against v2.4.0+ and above.
+
 When contributing to this repository, please first discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change. 
 
