@@ -50,12 +50,13 @@ RUN curl https://dl.cloudsmith.io/${KEA_REPO}/setup.deb.sh | bash \
         && apt-get install \
         --no-install-recommends \
         -y \
-        python3-isc-kea-connector=${KEA_VERSION} \
+        apt-utils \
         isc-kea-ctrl-agent=${KEA_VERSION} \
-        isc-kea-dhcp4-server=${KEA_VERSION} \
-        isc-kea-dhcp6-server=${KEA_VERSION} \
+        isc-kea-dhcp4=${KEA_VERSION} \
+        isc-kea-dhcp6=${KEA_VERSION} \
         isc-kea-admin=${KEA_VERSION} \
         isc-kea-common=${KEA_VERSION} \
+        isc-kea-hooks=${KEA_VERSION} \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/
@@ -85,6 +86,7 @@ RUN [ "${KEA_PREMIUM}" != "premium" ] || ( \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && mkdir -p /var/run/kea/ \
+        && ldconfig \
         )
 
 ENTRYPOINT [ "/bin/sh", "-c", \
