@@ -409,31 +409,116 @@ class Dhcp4:
         )
 
     def ha_continue(self) -> KeaResponse:
-        raise NotImplementedError
+        """Resumes operation of a paused HA state machine.
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-continue
+        """
+        return self.api.send_command(
+            command="ha-continue", service=self.service, required_hook="ha"
+        )
 
     def ha_heartbeat(self) -> KeaResponse:
-        raise NotImplementedError
+        """Manually verify the HA state of local and remote servers.
 
-    def ha_maintenance_canel(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-heartbeat
+        """
+        return self.api.send_command(
+            command="ha-heartbeat",
+            service=self.service,
+            required_hook="ha",
+        )
 
-    def ha_maintenance_notify(self) -> KeaResponse:
-        raise NotImplementedError
+    def ha_maintenance_cancel(self) -> KeaResponse:
+        """Cancel maintenance via API
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-cancel
+        """
+        return self.api.send_command(
+            command="ha-maintenance-cancel", service=self.service, required_hook="ha"
+        )
+
+    def ha_maintenance_notify(self, cancel: bool) -> KeaResponse:
+        """Typically used by servers and not an administrator, however this informs the partner HA
+        servers to transition to the in-maintenance state or revert from it
+
+        Args:
+            cancel:     Indicates server should transition to the in-maintenance state if False
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-notify
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-maintenance-notify",
+            service=self.service,
+            arguments={"cancel": cancel},
+            required_hook="ha",
+        )
 
     def ha_maintenance_start(self) -> KeaResponse:
-        raise NotImplementedError
+        """Instruct the server to transition to the 'partner-in-maintenance' state
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-start
+        """
+        return self.api.send_command(
+            command="ha-maintenance-start", service=self.service, required_hook="ha"
+        )
 
     def ha_reset(self) -> KeaResponse:
-        raise NotImplementedError
+        """Resets the HA state machine by forcing its state to 'waiting' state
 
-    def ha_scopes(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-reset
+        """
+        return self.api.send_command(
+            command="ha-reset", service=self.service, required_hook="ha"
+        )
 
-    def ha_sync(self) -> KeaResponse:
-        raise NotImplementedError
+    def ha_scopes(self, ha_servers: List[str]) -> KeaResponse:
+        """Modifies the scope that the server is responsible for serving
+
+        Args:
+            ha_servers:     List of servers (defined in the configuration file)
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-scopes
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-scopes",
+            service=self.service,
+            arguments={"scopes": ha_servers},
+            required_hook="ha",
+        )
+
+    def ha_sync(self, partner_server: str, max_period: int) -> KeaResponse:
+        """Instructs the server to sync its local lease database with a selected partner server
+
+        Args:
+            partner_server:     Name of the partner server to sync with
+            max_period:         Max Period
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-sync
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-sync",
+            service=self.service,
+            arguments={"server-name": partner_server, "max-period": max_period},
+            required_hook="ha",
+        )
 
     def ha_sync_complete_notify(self) -> KeaResponse:
-        raise NotImplementedError
+        """Typically used by the servers directly and not called via the API by an admin
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-sync-complete-notify
+        """
+        return self.api.send_command(
+            command="ha-sync-complete-notify", service=self.service, required_hook="ha"
+        )
 
     def lease4_add(
         self,

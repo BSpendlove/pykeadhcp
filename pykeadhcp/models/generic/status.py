@@ -1,18 +1,13 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pykeadhcp.models.generic.base import KeaBaseModel
 from pykeadhcp.models.generic import Sockets
+from pykeadhcp.models.generic.high_availability import HighAvailability
 
 
-class StatusGet(BaseModel):
+class StatusGet(KeaBaseModel):
     pid: int
     uptime: int
     reload: int
     multi_threading_enabled: Optional[bool]
     sockets: Optional[Sockets]
-    high_availability: Optional[List[dict]] = []
-
-    class Config:
-        fields = {
-            "multi_threading_enabled": "multi-threading-enabled",
-            "high_availability": "high-availability",
-        }
+    high_availability: Optional[List[HighAvailability]] = []
