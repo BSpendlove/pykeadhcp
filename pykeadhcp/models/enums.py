@@ -86,3 +86,30 @@ class AuthenticationTypeEnum(str, Enum):
 class RemoteMapTypeEnum(str, Enum):
     mysql = "mysql"
     postgresql = "postgresql"
+
+
+class HAModeTypeEnum(str, Enum):
+    load_balancing = "load-balancing"
+    hot_standby = "hot-standby"
+
+
+class HARoleTypeEnum(str, Enum):
+    primary = "primary"
+    secondary = "secondary"
+    standby = "standby"
+
+
+class HAStateTypeEnum(str, Enum):
+    backup = "backup"
+    communication_recovery = "communication-recovery"
+    hot_standby = "hot-standby"
+    load_balancing = "load-balancing"
+    in_maintenance = "in-maintenance"
+    partner_down = "partner-down"
+    partner_in_maintenance = "partner-in-maintenance"
+    passive_backup = "passive-backup"
+    ready = "ready"
+    synbcing = "syncing"
+    terminated = "terminated"
+    waiting = "waiting"
+    unavailable = "unavailable"
