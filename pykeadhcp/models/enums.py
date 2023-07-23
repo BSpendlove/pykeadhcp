@@ -113,3 +113,4 @@ class HAStateTypeEnum(str, Enum):
     terminated = "terminated"
     waiting = "waiting"
     unavailable = "unavailable"
+    null = ""

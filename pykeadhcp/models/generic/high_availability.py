@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 from pykeadhcp.models.generic.base import KeaBaseModel
 from pykeadhcp.models.enums import HAModeTypeEnum, HARoleTypeEnum, HAStateTypeEnum
 
@@ -13,7 +13,7 @@ class HAServerRemote(KeaBaseModel):
     age: int
     in_touch: bool
     last_scopes: List[str]
-    last_state: HAStateTypeEnum
+    last_state: Union[None, HAStateTypeEnum]
     role: HARoleTypeEnum
 
 

@@ -19,3 +19,4 @@ class Dhcp6DaemonConfig(CommonDhcpDaemonConfig):
     mac_sources: Optional[List[str]] = []
     relay_supplied_options: Optional[List[str]] = []
     server_id: ServerId
+    pd_allocator: Optional[str]

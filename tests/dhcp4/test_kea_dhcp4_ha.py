@@ -6,6 +6,7 @@ status-get (get HA mode)
 """
 
 
+@pytest.mark.order("first")
 def test_kea_dhcp4_ha_check_primary(kea_server: Kea):
     status = kea_server.dhcp4.status_get()
 

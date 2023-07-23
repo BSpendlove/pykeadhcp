@@ -58,3 +58,4 @@ class CommonDhcpDaemonConfig(CommonDaemonConfig):
     compatibility: Optional[dict]
     parked_packet_limit: Optional[int]
     decline_probation_period: Optional[int]
+    allocator: Optional[str]
