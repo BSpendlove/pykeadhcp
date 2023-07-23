@@ -20,6 +20,7 @@ services:
   kea:
     build:
       context: .
+      dockerfile: ./Dockerfiles/Dockerfile
       args:
         KEA_VERSION: ${KEA_VERSION}
         KEA_REPO: ${KEA_REPO}

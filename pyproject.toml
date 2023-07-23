@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pykeadhcp"
-version = "0.6.0"
+version = "0.7.0a2"
 description = "Wrapper around requests module to query ISC Kea DHCP API Daemons (ctrlagent, dhcp4, dhcp6, ddns)"
 authors = ["Brandon Spendlove <brandon-spendlove@hotmail.co.uk>"]
 license = "Apache 2.0"
@@ -11,6 +11,11 @@ python = "^3.10"
 requests = "^2.31.0"
 pydantic = "^1.10.8"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+pytest = "^7.4.0"
+pytest-order = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core"]

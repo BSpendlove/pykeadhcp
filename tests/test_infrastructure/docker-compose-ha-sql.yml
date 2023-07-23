@@ -1,0 +1,84 @@
+version: '3.7'
+services:
+  db:
+    image: mysql:latest
+    command:
+      --bind-address=0.0.0.0
+      --ssl=0
+      --tls-version=''
+      --host-cache-size=0
+    restart: always
+    environment:
+      MYSQL_DATABASE: "kea"
+      MYSQL_ROOT_PASSWORD: "secret123"
+      MYSQL_ROOT_HOST: "0.0.0.0"
+    ports:
+      - 3306:3306
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      ha_backend:
+
+  keaprimary:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/Dockerfile
+      args:
+        KEA_VERSION: ${KEA_VERSION}
+        KEA_REPO: ${KEA_REPO}
+        KEA_PREMIUM: ${KEA_PREMIUM}
+    ports:
+      - "8080:8080" # Supervisor API Access
+      - "8000:8000" # Ctrl Agent Daemon
+    environment:
+      KEA_VERSION: "2.2.0-isc20220726061131"
+      KEA_REPO: "public/isc/kea-2-2"
+      KEA_PREMIUM: ""
+    env_file:
+      - .env
+    volumes:
+      - ./configs/supervisor/supervisord.conf:/etc/supervisor/supervisord.conf:Z
+      - ./configs/supervisor/conf.d/:/etc/supervisor/conf.d:Z
+      - ./configs/ha/primary/kea-ctrl-agent.conf:/etc/kea/kea-ctrl-agent.conf:Z
+      - ./configs/ha/primary/kea-dhcp4-sql.conf:/etc/kea/kea-dhcp4.conf:Z
+      - ./configs/ha/primary/kea-dhcp6-sql.conf:/etc/kea/kea-dhcp6.conf:Z
+    tty: true
+    networks:
+      ha_backend:
+        ipv4_address: 192.0.2.150
+
+  keastandby:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/Dockerfile
+      args:
+        KEA_VERSION: ${KEA_VERSION}
+        KEA_REPO: ${KEA_REPO}
+        KEA_PREMIUM: ${KEA_PREMIUM}
+    ports:
+      - "8081:8080" # Supervisor API Access
+      - "8001:8000" # Ctrl Agent Daemon
+    environment:
+      KEA_VERSION: "2.2.0-isc20220726061131"
+      KEA_REPO: "public/isc/kea-2-2"
+      KEA_PREMIUM: ""
+    env_file:
+      - .env
+    volumes:
+      - ./configs/supervisor/supervisord.conf:/etc/supervisor/supervisord.conf:Z
+      - ./configs/supervisor/conf.d/:/etc/supervisor/conf.d:Z
+      - ./configs/ha/standby/kea-ctrl-agent.conf:/etc/kea/kea-ctrl-agent.conf:Z
+      - ./configs/ha/standby/kea-dhcp4-sql.conf:/etc/kea/kea-dhcp4.conf:Z
+      - ./configs/ha/standby/kea-dhcp6-sql.conf:/etc/kea/kea-dhcp6.conf:Z
+    tty: true
+    networks:
+      ha_backend:
+        ipv4_address: 192.0.2.151
+
+networks:
+  ha_backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.0.2.128/25
+          gateway: 192.0.2.129

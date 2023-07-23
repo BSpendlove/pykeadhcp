@@ -1,0 +1,10 @@
+FROM ubuntu:22.04
+
+RUN DEBIAN_FRONTEND=noninteractive \
+    apt-get update \
+    && apt-get install \
+    -y \
+    --no-install-recommends \
+    kea-admin
+
+RUN perfdhcp -4 -R 100 -B -l eth0 -x ael -g multi

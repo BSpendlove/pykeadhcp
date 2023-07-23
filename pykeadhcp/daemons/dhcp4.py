@@ -66,6 +66,157 @@ class Dhcp4:
         """
         return self.api.send_command(command="build-report", service=self.service)
 
+    def cache_clear(self) -> KeaResponse:
+        """Removes all cached host reservations
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-clear
+        """
+        return self.api.send_command(
+            command="cache-clear", service=self.service, required_hook="host_cache"
+        )
+
+    def cache_flush(self, number: int) -> KeaResponse:
+        """Removes certain number of entries in the host cache
+
+        Args:
+            number:     Number of host caches to clear
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-flush
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-flush",
+            service=self.service,
+            arguments=number,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
+    def cache_get(self) -> List[Reservation4]:
+        """Gets full content of the host cache
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-get
+        """
+        data = self.api.send_command(
+            command="cache-get", service=self.service, required_hook="host_cache"
+        )
+
+        if data.result == 3:
+            return []
+
+        return [Reservation4.parse_obj(reservation) for reservation in data.arguments]
+
+    def cache_get_by_id(
+        self, identifier_type: HostReservationIdentifierEnum, identifier: str
+    ) -> List[Reservation4]:
+        """Returns entries matching the given identifier from the host cache
+
+        Args:
+            identifier_type:        Type of Identifier
+            identifier:             Identifier data
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-get-by-id
+        """
+        try:
+            HostReservationIdentifierEnum(identifier_type)
+        except ValueError:
+            raise KeaUnknownHostReservationTypeException(identifier_type)
+
+        data = self.api.send_command_with_arguments(
+            command="cache-get-by-id",
+            service=self.service,
+            arguments={identifier_type: identifier},
+            required_hook="host_cache",
+        )
+
+        if data.result == 3:
+            return []
+
+        return [Reservation4.parse_obj(reservation) for reservation in data.arguments]
+
+    def cache_insert(self, subnet_id: int, reservation: Reservation4) -> KeaResponse:
+        """Manually insert a host into the cache
+
+        Args:
+            reservation:    Reservation4 Object
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-insert
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-insert",
+            service=self.service,
+            arguments={
+                "subnet-id4": subnet_id,
+                "subnet-id6": 0,
+                **reservation.dict(
+                    exclude_none=True, exclude_unset=True, by_alias=True
+                ),
+            },
+            required_hook="host_cache",
+        )
+
+    def cache_load(self, filepath: str) -> KeaResponse:
+        """Instructs Kea to load from a previously dumped cache into its existing host cache
+
+        Args:
+            filepath:   File Path to load
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-load
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-load",
+            service=self.service,
+            arguments=filepath,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
+    def cache_remove(self, subnet_id: int, ip_address: str) -> KeaResponse:
+        """Remove an entry from the host cache
+
+        Args:
+            subnet_id:      Subnet ID
+            ip_address:     IP Address
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-remove
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-remove",
+            service=self.service,
+            arguments={"ip-address": ip_address, "subnet-id": subnet_id},
+            required_hook="host_cache",
+        )
+
+    def cache_size(self) -> KeaResponse:
+        """Returns the number of entries in the host cache
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-size
+        """
+        return self.api.send_command(
+            command="cache-size", service=self.service, required_hook="host_cache"
+        )
+
+    def cache_write(self, filepath: str) -> KeaResponse:
+        """Instructs Kea to write host cache content to disk
+
+        Args:
+            filepath:   File Path to save
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/kea-2.2.0/api.html#cache-write
+        """
+        return self.api.send_command_with_arguments(
+            command="cache-write",
+            service=self.service,
+            arguments=filepath,  # Inconsistent API....
+            required_hook="host_cache",
+        )
+
     def class_add(self, client_class: ClientClass4) -> KeaResponse:
         """Adds a new class to the existing server configuration
 
@@ -258,31 +409,116 @@ class Dhcp4:
         )
 
     def ha_continue(self) -> KeaResponse:
-        raise NotImplementedError
+        """Resumes operation of a paused HA state machine.
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-continue
+        """
+        return self.api.send_command(
+            command="ha-continue", service=self.service, required_hook="ha"
+        )
 
     def ha_heartbeat(self) -> KeaResponse:
-        raise NotImplementedError
+        """Manually verify the HA state of local and remote servers.
 
-    def ha_maintenance_canel(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-heartbeat
+        """
+        return self.api.send_command(
+            command="ha-heartbeat",
+            service=self.service,
+            required_hook="ha",
+        )
 
-    def ha_maintenance_notify(self) -> KeaResponse:
-        raise NotImplementedError
+    def ha_maintenance_cancel(self) -> KeaResponse:
+        """Cancel maintenance via API
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-cancel
+        """
+        return self.api.send_command(
+            command="ha-maintenance-cancel", service=self.service, required_hook="ha"
+        )
+
+    def ha_maintenance_notify(self, cancel: bool) -> KeaResponse:
+        """Typically used by servers and not an administrator, however this informs the partner HA
+        servers to transition to the in-maintenance state or revert from it
+
+        Args:
+            cancel:     Indicates server should transition to the in-maintenance state if False
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-notify
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-maintenance-notify",
+            service=self.service,
+            arguments={"cancel": cancel},
+            required_hook="ha",
+        )
 
     def ha_maintenance_start(self) -> KeaResponse:
-        raise NotImplementedError
+        """Instruct the server to transition to the 'partner-in-maintenance' state
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-maintenance-start
+        """
+        return self.api.send_command(
+            command="ha-maintenance-start", service=self.service, required_hook="ha"
+        )
 
     def ha_reset(self) -> KeaResponse:
-        raise NotImplementedError
+        """Resets the HA state machine by forcing its state to 'waiting' state
 
-    def ha_scopes(self) -> KeaResponse:
-        raise NotImplementedError
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-reset
+        """
+        return self.api.send_command(
+            command="ha-reset", service=self.service, required_hook="ha"
+        )
 
-    def ha_sync(self) -> KeaResponse:
-        raise NotImplementedError
+    def ha_scopes(self, ha_servers: List[str]) -> KeaResponse:
+        """Modifies the scope that the server is responsible for serving
+
+        Args:
+            ha_servers:     List of servers (defined in the configuration file)
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-scopes
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-scopes",
+            service=self.service,
+            arguments={"scopes": ha_servers},
+            required_hook="ha",
+        )
+
+    def ha_sync(self, partner_server: str, max_period: int) -> KeaResponse:
+        """Instructs the server to sync its local lease database with a selected partner server
+
+        Args:
+            partner_server:     Name of the partner server to sync with
+            max_period:         Max Period
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-sync
+        """
+        return self.api.send_command_with_arguments(
+            command="ha-sync",
+            service=self.service,
+            arguments={"server-name": partner_server, "max-period": max_period},
+            required_hook="ha",
+        )
 
     def ha_sync_complete_notify(self) -> KeaResponse:
-        raise NotImplementedError
+        """Typically used by the servers directly and not called via the API by an admin
+
+        Kea API Reference:
+            https://kea.readthedocs.io/en/latest/api.html#ha-sync-complete-notify
+        """
+        return self.api.send_command(
+            command="ha-sync-complete-notify", service=self.service, required_hook="ha"
+        )
 
     def lease4_add(
         self,
@@ -1617,7 +1853,7 @@ class Dhcp4:
         try:
             HostReservationIdentifierEnum(identifier_type)
         except ValueError:
-            raise KeaUnknownHostReservationTypeException
+            raise KeaUnknownHostReservationTypeException(identifier_type)
 
         return self.api.send_command_with_arguments(
             command="reservation-del",
